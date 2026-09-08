@@ -2,864 +2,573 @@
 <html lang="lo" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ລະບົບຈັດການຂໍ້ມູນພະນັກງານ (Employee Management)</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="docTitle">ລະບົບຮັບຂອງແຖມ & ສະແກນ QR Code</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Lao (Noto Sans Lao) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Font Lao -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Supabase JS Client v2 -->
+    
+    <!-- QRCode JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- HTML5 QRCode Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <!-- Supabase JS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Dynamic Theme Overrides -->
+    <style id="customThemeStyles"></style>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Noto Sans Lao"', 'sans-serif'],
+                        sans: ['Noto Sans Lao', 'sans-serif'],
                     },
                     colors: {
                         brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
                         }
                     }
                 }
             }
         }
     </script>
+
     <style>
         body {
             font-family: 'Noto Sans Lao', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        
+        .glass-header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+
+        .custom-shadow {
+            box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.1);
+        }
+
+        .scan-laser {
+            animation: scanning 2s infinite ease-in-out;
+        }
+
+        @keyframes scanning {
+            0% { top: 5%; opacity: 0.8; }
+            50% { top: 90%; opacity: 1; }
+            100% { top: 5%; opacity: 0.8; }
+        }
+
+        /* Hide scrollbars for slick look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
-<body class="h-full flex flex-col text-slate-800">
+<body class="h-full bg-slate-50 text-slate-800 flex flex-col justify-between">
 
-    <!-- Header Navbar -->
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
-                    <i class="fa-solid me-0 fa-id-card text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">ລະບົບຈັດການຂໍ້ມູນພະນັກງານ</h1>
-                    <p class="text-xs text-slate-400">Supabase Database & Storage Integrated</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="toggleSqlModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm rounded-lg border border-slate-700 transition flex items-center space-x-2">
-                    <i class="fa-solid fa-database text-sky-400"></i>
-                    <span class="hidden sm:inline">ກວດເບິ່ງ</span> SQL Script
-                </button>
-                <button onclick="toggleConfigModal()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm rounded-lg shadow-sm transition flex items-center space-x-2">
-                    <i class="fa-solid fa-plug"></i>
-                    <span>ຕັ້ງຄ່າ API</span>
-                </button>
-            </div>
+    <div id="inAppWarning" class="hidden bg-amber-500 text-white px-4 py-2 text-xs font-medium flex justify-between items-center z-50 sticky top-0 shadow-md">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation text-base animate-bounce"></i>
+            <span>ກະລຸນາເປີດໃນ Chrome ຫຼື Safari ເພື່ອໃຫ້ກ້ອງເຮັດວຽກໄດ້ປົກກະຕິ</span>
         </div>
-    </header>
+        <button onclick="dismissWarning()" class="text-white hover:text-amber-200">
+            <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+    </div>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-
-        <!-- Connection Alert Status Bar -->
-        <div id="connectionStatus" class="p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 border-amber-200 text-amber-800 transition-all">
-            <div class="flex items-center space-x-3">
-                <i id="statusIcon" class="fa-solid fa-triangle-exclamation text-amber-600 text-xl"></i>
-                <div>
-                    <p id="statusTitle" class="font-semibold text-sm">ຍັງບໍ່ທັນເຊື່ອມຕໍ່ກັບ Supabase</p>
-                    <p id="statusDesc" class="text-xs opacity-90">ກະລຸນາໃສ່ Supabase URL ແລະ Anon Key ຢູ່ປຸ່ມ "ຕັ້ງຄ່າ API" ດ້ານເທິງ ຫຼື ທົດສອບໃຊ້ລະບົບດ້ວຍ Mock Data</p>
+    <div class="min-h-screen flex flex-col justify-between pb-24">
+        
+        <header class="sticky top-0 z-30 glass-header border-b border-slate-200/60 shadow-sm">
+            <div class="max-w-md mx-auto px-4 py-3.5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-md shadow-indigo-200 text-white">
+                        <i class="fa-solid fa-gift text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 id="appTitleDisplay" class="font-bold text-base text-slate-800 leading-tight">ລະບົບຮັບຂອງແຖມ</h1>
+                        <p id="appSubtitleDisplay" class="text-[10px] text-indigo-600 font-semibold uppercase tracking-wider">Registration & Scanner</p>
+                    </div>
                 </div>
-            </div>
-            <div id="statusActions" class="flex items-center space-x-2">
-                <button onclick="toggleConfigModal()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg whitespace-nowrap transition">
-                    ຕັ້ງຄ່າດຽວນີ້
+                <button onclick="toggleConfigModal()" class="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-all focus:outline-none" title="ຕັ້ງຄ່າ API & ລະບົບ">
+                    <i class="fa-solid fa-sliders text-sm"></i>
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <main class="max-w-md mx-auto w-full px-4 pt-4 flex-grow">
 
-            <!-- Left Side: Add / Edit Form -->
-            <section class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80">
-                <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-                    <div class="flex items-center space-x-2">
-                        <i id="formIcon" class="fa-solid fa-user-plus text-sky-600 text-lg"></i>
-                        <h2 id="formTitle" class="font-bold text-slate-800 text-base sm:text-lg">ເພີ່ມຂໍ້ມູນພະນັກງານ</h2>
+            <!-- ==================== TAB 1: REGISTRATION FORM ==================== -->
+            <section id="tabRegister" class="space-y-4">
+                
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                        <div class="w-2 h-5 bg-indigo-600 rounded-full"></div>
+                        <h2 class="font-bold text-slate-800 text-base">ກອກຂໍ້ມູນລົງທະບຽນ</h2>
                     </div>
-                    <span id="editBadge" class="hidden px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                        ກຳລັງແກ້ໄຂ
-                    </span>
-                </div>
 
-                <form id="profileForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                    <input type="hidden" id="recordId" value="">
-
-                    <!-- 1. ວັນທີ (Entry Date) -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ວັນທີບັນທຶກ <span class="text-rose-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-regular fa-calendar"></i>
-                            </span>
-                            <input type="date" id="entryDate" required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                    <form id="regForm" onsubmit="handleRegister(event)" class="space-y-4">
+                        
+                        <!-- Full Name Input -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ຊື່ ແລະ ນາມສະກຸນ <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-user text-xs"></i>
+                                </span>
+                                <input type="text" id="fullName" required placeholder="ປ້ອນຊື່ ແລະ ນາມສະກຸນ" class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 2. ຊື່-ນາມສະກຸນ (Full Name) -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ຊື່ ແລະ ນາມສະກຸນ <span class="text-rose-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-regular fa-user"></i>
-                            </span>
-                            <input type="text" id="fullName" placeholder="ທ້າວ / ນາງ..." required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                        <!-- Phone Number Input -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ເບີໂທລະສັບ <span class="text-rose-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                </span>
+                                <input type="tel" id="phone" required placeholder="020 XXXXXXXX" class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 3. ຕຳແໜ່ງ (Position) -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ຕຳແໜ່ງ <span class="text-rose-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-briefcase"></i>
-                            </span>
-                            <input type="text" id="position" placeholder="ຕົວຢ່າງ: ນັກພັດທະນາເວັບ, ບັນຊີ..." required class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                        <!-- Category Selection -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ເລືອກປະເພດ/ສາຂາ <span class="text-rose-500">*</span></label>
+                            <div class="grid grid-cols-4 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="category" value="A" checked class="peer sr-only">
+                                    <div class="py-2.5 text-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-bold text-sm peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all shadow-sm">
+                                        A
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="category" value="B" class="peer sr-only">
+                                    <div class="py-2.5 text-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-bold text-sm peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all shadow-sm">
+                                        B
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="category" value="C" class="peer sr-only">
+                                    <div class="py-2.5 text-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-bold text-sm peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all shadow-sm">
+                                        C
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="category" value="D" class="peer sr-only">
+                                    <div class="py-2.5 text-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-bold text-sm peer-checked:bg-indigo-600 peer-checked:text-white peer-checked:border-indigo-600 transition-all shadow-sm">
+                                        D
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 4. ເບີໂທ (Phone Number) -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ເບີໂທລະສັບ</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-phone"></i>
-                            </span>
-                            <input type="tel" id="phoneNumber" placeholder="020 XXXXXXXX" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
+                        <!-- Rewards Textarea -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ລາຍການຂອງແຖມ <span class="text-rose-500">*</span></label>
+                            <textarea id="rewards" rows="2" required placeholder="ລະບຸລາຍການຂອງແຖມ..." class="w-full p-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"></textarea>
                         </div>
-                    </div>
 
-                    <!-- 5. ວັນເດືອນປີເກີດ (Date of Birth) -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ວັນເດືອນປີເກີດ</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                <i class="fa-solid fa-cake-candles"></i>
-                            </span>
-                            <input type="date" id="birthDate" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
-                        </div>
-                    </div>
-
-                    <!-- 6. ຮູບໂປຣໄຟລ໌ / ອັບໂຫຼດໄຟລ໌ Storage 'slips' -->
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">ຮູບໂປຣໄຟລ໌ (Storage: slips)</label>
-                        <div class="mt-1 flex items-center space-x-4">
-                            <div class="relative w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 group">
-                                <img id="imagePreview" src="https://placehold.co/150x150/e2e8f0/64748b?text=Photo" alt="Preview" class="w-full h-full object-cover">
-                                <div id="removeImgBtn" onclick="clearImagePreview()" class="hidden absolute inset-0 bg-black/50 text-white items-center justify-center cursor-pointer hover:opacity-100 transition">
-                                    <i class="fa-solid fa-trash-can text-sm"></i>
+                        <!-- Upload 1: ID Card -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ຮູບບັດປະຈຳໂຕ/ສຳມະໂນຄົວ</label>
+                            <div class="flex items-center space-x-3">
+                                <label class="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all cursor-pointer">
+                                    <i class="fa-solid fa-id-card text-indigo-500 text-xl mb-1"></i>
+                                    <span class="text-xs text-slate-500 font-medium">ເລືອກ/ຖ່າຍຮູບ</span>
+                                    <input type="file" id="idCardInput" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 'idCardPreview')">
+                                </label>
+                                <div id="idCardPreviewContainer" class="hidden relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                                    <img id="idCardPreview" src="" class="w-full h-full object-cover">
+                                    <button type="button" onclick="clearImage('idCardInput', 'idCardPreviewContainer')" class="absolute top-1 right-1 bg-rose-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="flex-1">
-                                <input type="file" id="imageFile" accept="image/*" onchange="previewSelectedImage(event)" class="hidden">
-                                <label for="imageFile" class="cursor-pointer inline-flex items-center px-3 py-2 border border-slate-300 shadow-sm text-xs rounded-xl font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
-                                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-sky-600"></i>
-                                    ເລືອກຮູບພາບ
+                        </div>
+
+                        <!-- Upload 2: Store Front -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ຮູບໜ້າຮ້ານ</label>
+                            <div class="flex items-center space-x-3">
+                                <label class="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all cursor-pointer">
+                                    <i class="fa-solid fa-store text-indigo-500 text-xl mb-1"></i>
+                                    <span class="text-xs text-slate-500 font-medium">ເລືອກ/ຖ່າຍຮູບ</span>
+                                    <input type="file" id="storeInput" accept="image/*" capture="environment" class="hidden" onchange="previewImage(this, 'storePreview')">
                                 </label>
-                                <p class="text-[10px] text-slate-400 mt-1">ຮອງຮັບ PNG, JPG (ຈະອັບໂຫຼດເຂົ້າ bucket 'slips')</p>
+                                <div id="storePreviewContainer" class="hidden relative w-16 h-16 rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
+                                    <img id="storePreview" src="" class="w-full h-full object-cover">
+                                    <button type="button" onclick="clearImage('storeInput', 'storePreviewContainer')" class="absolute top-1 right-1 bg-rose-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" id="submitBtn" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-200 active:scale-[0.99] transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                            <span>ບັນທຶກ ແລະ ສ້າງ QR Code</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Success Result Card (Hidden by default) -->
+                <div id="resultCard" class="hidden bg-white rounded-3xl p-6 shadow-lg border border-indigo-100 text-center space-y-4 animate-fade-in">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full text-xl mb-1">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">ລົງທະບຽນສໍາເລັດ!</h3>
+                    
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 inline-block">
+                        <div id="qrcode" class="flex justify-center p-2 bg-white rounded-xl shadow-inner"></div>
+                        <p id="displayRegId" class="mt-2 font-mono font-bold text-indigo-600 text-sm tracking-wide"></p>
+                    </div>
+
+                    <div class="text-left text-xs bg-slate-50 p-3 rounded-xl space-y-1 text-slate-600">
+                        <p><strong class="text-slate-800">ຊື່:</strong> <span id="resName"></span></p>
+                        <p><strong class="text-slate-800">ເບີໂທ:</strong> <span id="resPhone"></span></p>
+                        <p><strong class="text-slate-800">ປະເພດ:</strong> <span id="resCat"></span></p>
+                    </div>
+
+                    <button onclick="resetRegForm()" class="w-full py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold text-xs rounded-xl transition-all">
+                        ລົງທະບຽນໃໝ່
+                    </button>
+                </div>
+
+            </section>
+
+            <!-- ==================== TAB 2: VERIFICATION SCANNER ==================== -->
+            <section id="tabScan" class="hidden space-y-4 pb-12">
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-4">
+                    <div class="flex items-center space-x-2 pb-2 border-b border-slate-100">
+                        <div class="w-2 h-5 bg-violet-600 rounded-full"></div>
+                        <h2 class="font-bold text-slate-800 text-base">ສະແກນ QR Code ກວດສອບ</h2>
+                    </div>
+
+                    <!-- Scanner Container -->
+                    <div class="relative bg-slate-900 rounded-2xl overflow-hidden aspect-square flex flex-col items-center justify-center border border-slate-800 shadow-inner">
+                        <div id="reader" class="w-full h-full"></div>
+                        
+                        <!-- Scanner Placeholder Overlay -->
+                        <div id="scannerPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 text-white p-4 text-center z-10">
+                            <div class="w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-2xl mb-3 animate-pulse">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </div>
+                            <p class="text-xs text-slate-300 font-medium">ກົດປຸ່ມ "ເປີດກ້ອງສະແກນ" ດ້ານລຸ່ມເພື່ອເລີ່ມຕົ້ນ</p>
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="pt-4 flex items-center space-x-3">
-                        <button type="submit" id="submitBtn" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 px-4 rounded-xl shadow-md shadow-sky-600/20 text-sm transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span id="btnText">ບັນທຶກຂໍ້ມູນ</span>
+                    <!-- Scan Control Buttons -->
+                    <div class="space-y-2">
+                        <button id="startScanBtn" onclick="startScanner()" class="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-200 active:scale-[0.99] transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>ເປີດກ້ອງສະແກນ QR Code</span>
                         </button>
                         
-                        <!-- Reset / Clear Button (Requirement: ລ້າງຄ່າຕ່າງໆ ແທນການຣີໂຫຼດເວັບ) -->
-                        <button type="button" onclick="resetFormState()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-xl text-sm transition flex items-center space-x-2" title="ລ້າງຂໍ້ມູນທັງໝົດໃນຟອມ">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span>ລ້າງຄ່າ</span>
+                        <button id="stopScanBtn" onclick="stopScanner()" class="hidden w-full py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-stop text-xs"></i>
+                            <span>ປິດກ້ອງສະແກນ</span>
+                        </button>
+
+                        <label class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer border border-slate-200/80">
+                            <i class="fa-solid fa-image text-indigo-600"></i>
+                            <span>ເລືອກຮູບ QR Code ຈາກເຄື່ອງ</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="scanQRFromFile(this)">
+                        </label>
+                    </div>
+
+                    <!-- Manual ID Search -->
+                    <div class="pt-2 border-t border-slate-100 space-y-2">
+                        <label class="block text-xs font-semibold text-slate-600">ຫຼື ປ້ອນ ID ກວດສອບໂດຍກົງ:</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="manualIdInput" placeholder="ເຊັ່ນ: REG-123456" class="flex-1 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <button onclick="searchManualId()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span>ຄົ້ນຫາ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Result Card -->
+                <div id="verifyResultCard" class="hidden bg-white rounded-3xl p-5 shadow-lg border border-indigo-100 space-y-4 animate-fade-in">
+                    <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                        <div>
+                            <span id="vStatusBadge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+                                ຍັງບໍ່ທັນຮັບ
+                            </span>
+                            <h3 id="vRegId" class="font-mono font-bold text-indigo-600 text-base mt-1"></h3>
+                        </div>
+                        <button onclick="hideVerifyResult()" class="text-slate-400 hover:text-slate-600 p-1">
+                            <i class="fa-solid fa-xmark text-lg"></i>
                         </button>
                     </div>
-                </form>
-            </section>
 
-            <!-- Right Side: Employee Table / Records -->
-            <section class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col">
-                <!-- Search & Filter Bar -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                        </span>
-                        <input type="text" id="searchInput" onkeyup="filterRecords()" placeholder="ຄົ້ນຫາຕາມຊື່, ຕຳແໜ່ງ ຫຼື ເບີໂທ..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition">
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span id="recordCounter" class="text-xs text-slate-500 font-medium px-3 py-2 bg-slate-100 rounded-xl whitespace-nowrap">
-                            ທັງໝົດ: 0 ທ່ານ
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Table Container -->
-                <div class="flex-1 overflow-x-auto rounded-xl border border-slate-100 min-h-[350px]">
-                    <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 text-slate-700 text-xs uppercase font-semibold border-b border-slate-100">
-                            <tr>
-                                <th class="p-3">ຮູບ</th>
-                                <th class="p-3">ຊື່-ນາມສະກຸນ / ຕຳແໜ່ງ</th>
-                                <th class="p-3 hidden sm:table-cell">ເບີໂທ</th>
-                                <th class="p-3 hidden md:table-cell">ວັນທີ</th>
-                                <th class="p-3 text-right">ຈັດການ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-slate-100">
-                            <!-- Rows loaded dynamically -->
-                        </tbody>
-                    </table>
-
-                    <!-- Loading / Empty States -->
-                    <div id="loadingState" class="p-12 text-center text-slate-400 flex flex-col items-center justify-center">
-                        <i class="fa-solid fa-spinner fa-spin text-2xl text-sky-500 mb-2"></i>
-                        <p class="text-xs">ກຳລັງໂຫຼດຂໍ້ມູນ...</p>
+                    <div class="space-y-2 text-xs text-slate-700">
+                        <div class="flex justify-between py-1 border-b border-slate-50">
+                            <span class="text-slate-500">ຊື່-ນາມສະກຸນ:</span>
+                            <span id="vName" class="font-bold text-slate-800"></span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-50">
+                            <span class="text-slate-500">ເບີໂທ:</span>
+                            <span id="vPhone" class="font-bold text-slate-800"></span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-slate-50">
+                            <span class="text-slate-500">ປະເພດ/ສາຂາ:</span>
+                            <span id="vCategory" class="font-bold text-indigo-600"></span>
+                        </div>
+                        <div class="py-1">
+                            <span class="text-slate-500 block mb-1">ລາຍການຂອງແຖມ:</span>
+                            <div id="vRewards" class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 font-medium text-slate-800 leading-relaxed"></div>
+                        </div>
                     </div>
 
-                    <div id="emptyState" class="hidden p-12 text-center text-slate-400">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
-                        <p class="text-sm font-medium">ບໍ່ພົບຂໍ້ມູນໃດໆ</p>
-                        <p class="text-xs text-slate-400 mt-1">ລອງເພີ່ມຂໍ້ມູນໃໝ່ຜ່ານຟອມດ້ານຊ້າຍ</p>
+                    <!-- Images Preview in Result -->
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div id="vIdCardBox" class="hidden space-y-1">
+                            <span class="text-[10px] font-semibold text-slate-500 block">ຮູບບັດ/ສຳມະໂນຄົວ</span>
+                            <img id="vIdCardImg" src="" class="w-full h-24 object-cover rounded-xl border border-slate-200">
+                        </div>
+                        <div id="vStoreBox" class="hidden space-y-1">
+                            <span class="text-[10px] font-semibold text-slate-500 block">ຮູບໜ້າຮ້ານ</span>
+                            <img id="vStoreImg" src="" class="w-full h-24 object-cover rounded-xl border border-slate-200">
+                        </div>
                     </div>
+
+                    <!-- Confirm Claim Button -->
+                    <button id="confirmClaimBtn" onclick="confirmReceipt()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-emerald-200 transition-all flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>ຢືນຢັນການຮັບເຄື່ອງ</span>
+                    </button>
                 </div>
             </section>
+        </main>
 
+        <!-- Bottom Navigation Bar -->
+        <nav class="fixed bottom-0 left-0 right-0 z-40 glass-nav border-t border-slate-200/60 p-3">
+            <div class="max-w-md mx-auto flex items-center justify-around bg-slate-100/80 p-1.5 rounded-2xl">
+                <button id="tabRegisterBtn" onclick="switchTab('register')" class="flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>ລົງທະບຽນ</span>
+                </button>
+                <button id="tabScanBtn" onclick="switchTab('scan')" class="flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-700 transition-all duration-200 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-qrcode"></i>
+                    <span>ສະແກນ QR</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- CONFIG MODAL FOR SUPABASE, SHEETS CREDENTIALS & CUSTOMIZATION -->
+        <div id="configModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl animate-fade-in max-h-[90vh] overflow-y-auto no-scrollbar">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
+                        <i class="fa-solid fa-gear text-indigo-600"></i>
+                        <span>ຕັ້ງຄ່າລະບົບ & API</span>
+                    </h3>
+                    <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- System Title & Theme Customization -->
+                <div class="space-y-3 pb-3 border-b border-slate-100">
+                    <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center space-x-1">
+                        <i class="fa-solid fa-palette"></i>
+                        <span>ປັບແຕ່ງລະບົບ (App Customization)</span>
+                    </h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ຊື່ລະບົບ (System Title)</label>
+                        <input type="text" id="cfgSystemTitle" placeholder="ລະບົບຮັບຂອງແຖມ" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ຊື່ຍ່ອຍ (Sub-title)</label>
+                        <input type="text" id="cfgSystemSubtitle" placeholder="Registration & Scanner" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ເລືອກສີ Theme ຂອງລະບົບ</label>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <button type="button" onclick="selectThemePreset('#4f46e5')" class="w-7 h-7 rounded-full bg-indigo-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Indigo"></button>
+                            <button type="button" onclick="selectThemePreset('#059669')" class="w-7 h-7 rounded-full bg-emerald-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Emerald"></button>
+                            <button type="button" onclick="selectThemePreset('#2563eb')" class="w-7 h-7 rounded-full bg-blue-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Blue"></button>
+                            <button type="button" onclick="selectThemePreset('#e11d48')" class="w-7 h-7 rounded-full bg-rose-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Rose"></button>
+                            <button type="button" onclick="selectThemePreset('#d97706')" class="w-7 h-7 rounded-full bg-amber-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Amber"></button>
+                            <button type="button" onclick="selectThemePreset('#7c3aed')" class="w-7 h-7 rounded-full bg-violet-600 border-2 border-white shadow hover:scale-110 transition-transform" title="Violet"></button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" id="cfgThemeColor" class="w-9 h-9 p-0.5 rounded-xl border border-slate-200 cursor-pointer bg-white">
+                            <span class="text-xs text-slate-500">ຫຼື ເລືອກສີ Custom ຕາມໃຈ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Connection Settings -->
+                <div class="space-y-3 pt-1">
+                    <h4 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center space-x-1">
+                        <i class="fa-solid fa-plug"></i>
+                        <span>ການເຊື່ອມຕໍ່ (API & Database)</span>
+                    </h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Supabase URL</label>
+                        <input type="text" id="cfgSupabaseUrl" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Supabase Anon Key</label>
+                        <input type="password" id="cfgSupabaseKey" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Google Apps Script Web App URL (Optional)</label>
+                        <input type="text" id="cfgGasUrl" placeholder="https://script.google.com/macros/s/..." class="w-full p-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex space-x-2">
+                    <button onclick="saveConfig()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                        ບັນທຶກ
+                    </button>
+                    <button onclick="toggleConfigModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-xl transition-all">
+                        ຍົກເລີກ
+                    </button>
+                </div>
+            </div>
         </div>
-    </main>
 
-    <!-- Modal 1: Supabase API Configuration -->
-    <div id="configModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl transform transition-all border border-slate-100">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                <div class="flex items-center space-x-2 text-sky-600">
-                    <i class="fa-solid fa-sliders text-lg"></i>
-                    <h3 class="font-bold text-slate-800 text-base">ຕັ້ງຄ່າການເຊື່ອມຕໍ່ Supabase</h3>
-                </div>
-                <button onclick="toggleConfigModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Supabase Project URL</label>
-                    <input type="text" id="configUrl" placeholder="https://xyz.supabase.co" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Supabase Anon Key</label>
-                    <input type="password" id="configKey" placeholder="eyJhbGciOiJIUzI1NiI..." class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-                </div>
-                <p class="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                    <i class="fa-solid fa-circle-info text-sky-500 mr-1"></i>
-                    ຂໍ້ມູນນີ້ຈະຖືກບັນທຶກໃນ LocalStorage ຂອງບຣາວເຊີທ່ານ. ຫ້າມໃຊ້ຊື່ຕົວແປ <code class="bg-amber-100 px-1 rounded text-amber-800 font-mono">supabase</code> ຊໍ້າກັບ Lib.
-                </p>
-            </div>
-
-            <div class="mt-6 flex items-center justify-end space-x-2">
-                <button onclick="toggleConfigModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-xl">
-                    ຍົກເລີກ
-                </button>
-                <button onclick="saveSupabaseConfig()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-sky-600/20">
-                    ບັນທຶກ ແລະ ເຊື່ອມຕໍ່
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 2: SQL Script Display Viewer (Requirement 1) -->
-    <div id="sqlModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-                <div class="flex items-center space-x-2 text-emerald-600">
-                    <i class="fa-solid fa-code text-lg"></i>
-                    <h3 class="font-bold text-slate-800 text-base">Supabase SQL Editor Script</h3>
-                </div>
-                <button onclick="toggleSqlModal()" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <p class="text-xs text-slate-500 mb-3">
-                ກັອບປີ້ SQL ດ້ານລຸ່ມນີ້ໄປວາງ ແລະ ຣັນ (Run) ຢູ່ Supabase SQL Editor ເທື່ອດຽວ ເພື່ອສ້າງ Table, RLS Policy (4 ໂຕ) ແລະ Storage Bucket <code class="text-sky-600 bg-sky-50 px-1 rounded">slips</code>:
-            </p>
-
-            <div class="relative flex-1 bg-slate-900 rounded-xl p-4 overflow-y-auto text-xs font-mono text-slate-200 leading-relaxed border border-slate-800">
-                <button onclick="copySqlToClipboard()" class="absolute top-3 right-3 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 transition flex items-center space-x-1">
-                    <i class="fa-regular fa-copy"></i>
-                    <span id="copyBtnText">ກັອບປີ້ SQL</span>
-                </button>
-                <pre id="sqlCodeBlock"></pre>
-            </div>
-
-            <div class="mt-4 text-right">
-                <button onclick="toggleSqlModal()" class="px-4 py-2 bg-slate-800 text-white text-xs font-semibold rounded-xl hover:bg-slate-700">
-                    ອັດໜ້າຕ່າງ
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Toast Message Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-3 px-4 py-3 bg-slate-900 text-white text-xs font-medium rounded-xl shadow-2xl border border-slate-800">
-        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-        <span id="toastMsg">ຂໍ້ຄວາມແຈ້ງເຕືອນ</span>
     </div>
 
     <script>
-        // SQL Script content to be executed in Supabase SQL Editor
-        const SQL_SCRIPT = `-- 1. ສ້າງຕາຕະລາງ profiles ເກັມຂໍ້ມູນພະນັກງານ
-CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    entry_date DATE DEFAULT CURRENT_DATE,
-    full_name TEXT NOT NULL,
-    position TEXT,
-    phone_number TEXT,
-    birth_date DATE,
-    avatar_url TEXT
-);
+        // Supabase Default Credentials
+        const DEFAULT_SUPABASE_URL = "https://olvteqslbxwzifdfueug.supabase.co";
+        const DEFAULT_SUPABASE_KEY = "sb_publishable_5UOeJzl8fE3XaWKQ7gvmsA_Qkj4O7Xx";
 
--- 2. ອະນຸຍາດສິດ Access Permissions ໃຫ້ role anon ແລະ authenticated
-GRANT ALL ON TABLE public.profiles TO anon, authenticated, postgres, service_role;
+        // System Customization Defaults
+        const DEFAULT_APP_TITLE = "ລະບົບຮັບຂອງແຖມ";
+        const DEFAULT_APP_SUBTITLE = "Registration & Scanner";
+        const DEFAULT_THEME_COLOR = "#4f46e5";
 
--- 3. ເປີດໃຊ້ງານ RLS (Row Level Security)
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
--- 4. ສ້າງ Policy 4 ໂຕ ແຍກ SELECT, INSERT, UPDATE, DELETE (USING true / WITH CHECK true)
-DROP POLICY IF EXISTS "Allow public select on profiles" ON public.profiles;
-CREATE POLICY "Allow public select on profiles" ON public.profiles FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Allow public insert on profiles" ON public.profiles;
-CREATE POLICY "Allow public insert on profiles" ON public.profiles FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow public update on profiles" ON public.profiles;
-CREATE POLICY "Allow public update on profiles" ON public.profiles FOR UPDATE USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Allow public delete on profiles" ON public.profiles;
-CREATE POLICY "Allow public delete on profiles" ON public.profiles FOR DELETE USING (true);
-
--- 5. ສ້າງ Storage Bucket ຊື່ 'slips' ແລະ ເປີດ Public Access
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('slips', 'slips', true)
-ON CONFLICT (id) DO UPDATE SET public = true;
-
--- Policies ສໍາລັບ Storage Bucket 'slips'
-DROP POLICY IF EXISTS "Public select on slips bucket" ON storage.objects;
-CREATE POLICY "Public select on slips bucket" ON storage.objects FOR SELECT USING (bucket_id = 'slips');
-
-DROP POLICY IF EXISTS "Public insert on slips bucket" ON storage.objects;
-CREATE POLICY "Public insert on slips bucket" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'slips');
-
-DROP POLICY IF EXISTS "Public update on slips bucket" ON storage.objects;
-CREATE POLICY "Public update on slips bucket" ON storage.objects FOR UPDATE USING (bucket_id = 'slips') WITH CHECK (bucket_id = 'slips');
-
-DROP POLICY IF EXISTS "Public delete on slips bucket" ON storage.objects;
-CREATE POLICY "Public delete on slips bucket" ON storage.objects FOR DELETE USING (bucket_id = 'slips');
-
--- 6. ແຈ້ງ Supabase ໃຫ້ Refresh Schema Cache ທັນທີ
-NOTIFY pgrst, 'reload schema';`;
-
-        // IMPORTANT RULE: Variable name MUST NOT be 'supabase' to avoid conflict with window.supabase library!
-        let dbClient = null;
-        let profileRecords = [];
-        let isEditMode = false;
-        let selectedFile = null;
+        let supabaseClient = null;
+        let html5QrcodeScanner = null;
+        let currentRecord = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Fill SQL script block
-            document.getElementById('sqlCodeBlock').textContent = SQL_SCRIPT;
-
-            // Default today date
-            document.getElementById('entryDate').valueAsDate = new Date();
-
-            // Default provided Supabase Credentials
-            const defaultUrl = 'https://olvteqslbxwzifdfueug.supabase.co';
-            const defaultKey = 'sb_publishable_5UOeJzl8fE3XaWKQ7gvmsA_Qkj4O7Xx';
-
-            // Load saved Supabase credentials if available, otherwise use default
-            const savedUrl = localStorage.getItem('sp_url') || defaultUrl;
-            const savedKey = localStorage.getItem('sp_key') || defaultKey;
-
-            if (savedUrl) document.getElementById('configUrl').value = savedUrl;
-            if (savedKey) document.getElementById('configKey').value = savedKey;
-
-            if (savedUrl && savedKey) {
-                initSupabaseClient(savedUrl, savedKey);
-            } else {
-                loadMockData();
-            }
+            detectInAppBrowser();
+            applyThemeAndTitle();
+            initSupabase();
+            loadSavedConfigInputs();
         });
 
-        function initSupabaseClient(url, key) {
-            try {
-                if (window.supabase && typeof window.supabase.createClient === 'function') {
-                    dbClient = window.supabase.createClient(url, key);
-                    fetchRecords();
-                }
-            } catch (err) {
-                showToast("ການເຊື່ອມຕໍ່ Supabase ຜິດພາດ: " + err.message, "error");
-                loadMockData();
+        function applyThemeAndTitle() {
+            const title = localStorage.getItem('cfg_app_title') || DEFAULT_APP_TITLE;
+            const subtitle = localStorage.getItem('cfg_app_subtitle') || DEFAULT_APP_SUBTITLE;
+            const themeColor = localStorage.getItem('cfg_theme_color') || DEFAULT_THEME_COLOR;
+
+            // Update UI Title & Subtitle
+            const titleElem = document.getElementById('appTitleDisplay');
+            const subtitleElem = document.getElementById('appSubtitleDisplay');
+            const docTitleElem = document.getElementById('docTitle');
+
+            if (titleElem) titleElem.innerText = title;
+            if (subtitleElem) subtitleElem.innerText = subtitle;
+            if (docTitleElem) docTitleElem.innerText = title + " & ສະແກນ QR Code";
+
+            // Calculate secondary gradient color
+            const endColor = shiftColorHex(themeColor, 30);
+
+            // Inject custom style overrides for primary colors
+            let styleTag = document.getElementById('customThemeStyles');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'customThemeStyles';
+                document.head.appendChild(styleTag);
+            }
+
+            styleTag.innerHTML = `
+                .bg-indigo-600, .peer-checked\\:bg-indigo-600 { background-color: ${themeColor} !important; }
+                .border-indigo-600, .peer-checked\\:border-indigo-600 { border-color: ${themeColor} !important; }
+                .text-indigo-600, .peer-checked\\:text-indigo-600 { color: ${themeColor} !important; }
+                .focus\\:ring-indigo-500:focus { --tw-ring-color: ${themeColor} !important; }
+                .from-indigo-600 { --tw-gradient-from: ${themeColor} var(--tw-gradient-from-position) !important; --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+                .to-violet-600 { --tw-gradient-to: ${endColor} var(--tw-gradient-to-position) !important; }
+                .shadow-indigo-200 { --tw-shadow-color: ${themeColor}40 !important; }
+            `;
+        }
+
+        function shiftColorHex(hex, amount) {
+            let usePound = false;
+            if (hex[0] === "#") {
+                hex = hex.slice(1);
+                usePound = true;
+            }
+            let num = parseInt(hex, 16);
+            let r = (num >> 16) + amount;
+            if (r > 255) r = 255; else if (r < 0) r = 0;
+            let b = ((num >> 8) & 0x00FF) + amount;
+            if (b > 255) b = 255; else if (b < 0) b = 0;
+            let g = (num & 0x0000FF) + amount;
+            if (g > 255) g = 255; else if (g < 0) g = 0;
+            return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+        }
+
+        function selectThemePreset(colorHex) {
+            document.getElementById('cfgThemeColor').value = colorHex;
+        }
+
+        function detectInAppBrowser() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isInApp = (ua.indexOf("LINE") > -1) || (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
+            if (isInApp) {
+                document.getElementById('inAppWarning').classList.remove('hidden');
             }
         }
 
-        function setConnectionState(state, customMsg = '') {
-            const container = document.getElementById('connectionStatus');
-            const icon = document.getElementById('statusIcon');
-            const title = document.getElementById('statusTitle');
-            const desc = document.getElementById('statusDesc');
-            const actions = document.getElementById('statusActions');
-
-            if (state === 'connected') {
-                container.className = "p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50 border-emerald-200 text-emerald-800 transition-all";
-                icon.className = "fa-solid fa-circle-check text-emerald-600 text-xl";
-                title.textContent = "ເຊື່ອມຕໍ່ Supabase ສຳເລັດແລ້ວ";
-                desc.textContent = "ຕາຕະລາງ profiles ແລະ Storage slips ພ້ອມໃຊ້ງານ";
-                actions.innerHTML = `
-                    <button onclick="toggleConfigModal()" class="px-3 py-1.5 bg-white hover:bg-slate-50 border border-emerald-300 text-emerald-700 text-xs rounded-lg transition">
-                        ປ່ຽນແປງ API
-                    </button>
-                `;
-            } else if (state === 'table_missing') {
-                container.className = "p-4 rounded-xl border flex flex-col sm:flex-row sm:items-between gap-3 bg-rose-50 border-rose-200 text-rose-900 transition-all";
-                icon.className = "fa-solid fa-database text-rose-600 text-xl mt-0.5 sm:mt-0";
-                title.textContent = "ຍັງບໍ່ທັນມີຕາຕະລາງ 'public.profiles' ໃນ Supabase Database (Error PGRST205)";
-                desc.innerHTML = `
-                    <div class="mt-1 space-y-1 text-xs text-rose-700">
-                        <p class="font-medium">ວິທີແກ້ໄຂແບບງ່າຍໆ (ເຮັດເທື່ອດຽວ):</p>
-                        <ol class="list-decimal list-inside space-y-0.5">
-                            <li>ກົດປຸ່ມ <b>"ກັອບປີ້ SQL Script"</b> ດ້ານຂວານີ້</li>
-                            <li>ເປີດ <a href="https://supabase.com/dashboard" target="_blank" class="underline font-semibold text-rose-800">Supabase Dashboard</a> -> ເຂົ້າ <b>SQL Editor</b> -> ວາງ (Paste) ໂຄ້ດ -> ກົດ <b>Run</b></li>
-                            <li>ກົດປຸ່ມ <b>"ລອງເຊື່ອມຕໍ່ໃໝ່"</b> ເພື່ອເລີ່ມໃຊ້ງານ</li>
-                        </ol>
-                    </div>
-                `;
-                actions.innerHTML = `
-                    <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                        <button onclick="copySqlToClipboard()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow-sm whitespace-nowrap transition flex items-center space-x-1">
-                            <i class="fa-regular fa-copy"></i>
-                            <span>ກັອບປີ້ SQL Script</span>
-                        </button>
-                        <button onclick="toggleSqlModal()" class="px-3 py-1.5 bg-white hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-medium rounded-lg whitespace-nowrap transition flex items-center space-x-1">
-                            <i class="fa-solid fa-code"></i>
-                            <span>ເບິ່ງ SQL</span>
-                        </button>
-                        <button onclick="fetchRecords()" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium rounded-lg whitespace-nowrap transition flex items-center space-x-1">
-                            <i class="fa-solid fa-rotate"></i>
-                            <span>ລອງເຊື່ອມຕໍ່ໃໝ່</span>
-                        </button>
-                    </div>
-                `;
-            } else {
-                container.className = "p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50 border-amber-200 text-amber-800 transition-all";
-                icon.className = "fa-solid fa-triangle-exclamation text-amber-600 text-xl";
-                title.textContent = "ເກີດຂໍ້ຜິດພາດໃນການເຊື່ອມຕໍ່";
-                desc.textContent = customMsg || "ກະລຸນາກວດເບິ່ງ Supabase Credentials ຂອງທ່ານ";
-                actions.innerHTML = `
-                    <button onclick="toggleConfigModal()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs rounded-lg whitespace-nowrap transition">
-                        ຕັ້ງຄ່າ API
-                    </button>
-                `;
-            }
+        function dismissWarning() {
+            document.getElementById('inAppWarning').classList.add('hidden');
         }
 
-        async function fetchRecords() {
-            showLoading(true);
-            if (dbClient) {
+        function initSupabase() {
+            const url = localStorage.getItem('cfg_supabase_url') || DEFAULT_SUPABASE_URL;
+            const key = localStorage.getItem('cfg_supabase_key') || DEFAULT_SUPABASE_KEY;
+
+            if (url && key && window.supabase) {
                 try {
-                    const { data, error } = await dbClient
-                        .from('profiles')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-
-                    if (error) throw error;
-
-                    setConnectionState('connected');
-                    profileRecords = data || [];
-                    renderTable(profileRecords);
-                } catch (err) {
-                    console.error("Error fetching data:", err);
-                    
-                    if (err.code === 'PGRST205' || (err.message && err.message.includes('profiles'))) {
-                        setConnectionState('table_missing', err.message);
-                        showToast("ກະລຸນາກັອບປີ້ SQL Script ໄປຣັນໃນ Supabase SQL Editor!", "error");
-                    } else {
-                        setConnectionState('error', err.message);
-                        showToast("ບໍ່ສາມາດດຶງຂໍ້ມູນ: " + err.message, "error");
-                    }
-                    
-                    loadMockData();
-                } finally {
-                    showLoading(false);
-                }
-            } else {
-                loadMockData();
-            }
-        }
-
-        function loadMockData() {
-            showLoading(true);
-            setTimeout(() => {
-                profileRecords = [
-                    {
-                        id: '1',
-                        entry_date: '2026-09-01',
-                        full_name: 'ທ້າວ ສົມຊາຍ ວົງສາ',
-                        position: 'Senior Developer',
-                        phone_number: '020 55512345',
-                        birth_date: '1998-05-15',
-                        avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-                    },
-                    {
-                        id: '2',
-                        entry_date: '2026-09-03',
-                        full_name: 'ນາງ ມະລິວອນ ສຸວັນນະ',
-                        position: 'UI/UX Designer',
-                        phone_number: '020 99887766',
-                        birth_date: '2000-11-20',
-                        avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
-                    }
-                ];
-                renderTable(profileRecords);
-                showLoading(false);
-            }, 300);
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            const emptyState = document.getElementById('emptyState');
-            const counter = document.getElementById('recordCounter');
-
-            tbody.innerHTML = '';
-            counter.textContent = `ທັງໝົດ: ${data.length} ທ່ານ`;
-
-            if (data.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            data.forEach((item) => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50/80 transition duration-150';
-                
-                const avatarSrc = item.avatar_url || 'https://placehold.co/150x150/e2e8f0/64748b?text=User';
-
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <img src="${avatarSrc}" onerror="this.src='https://placehold.co/150x150/e2e8f0/64748b?text=User'" class="w-10 h-10 rounded-xl object-cover border border-slate-200">
-                    </td>
-                    <td class="p-3">
-                        <div class="font-semibold text-slate-800 text-sm">${escapeHtml(item.full_name)}</div>
-                        <div class="text-xs text-slate-500">${escapeHtml(item.position || '-')}</div>
-                    </td>
-                    <td class="p-3 text-xs text-slate-600 hidden sm:table-cell">
-                        ${escapeHtml(item.phone_number || '-')}
-                    </td>
-                    <td class="p-3 text-xs text-slate-500 hidden md:table-cell">
-                        ${item.entry_date || '-'}
-                    </td>
-                    <td class="p-3 text-right space-x-1">
-                        <button onclick="editRecord('${item.id}')" class="p-2 text-sky-600 hover:bg-sky-50 rounded-lg transition" title="ແກ້ໄຂ">
-                            <i class="fa-regular fa-pen-to-square"></i>
-                        </button>
-                        <button onclick="deleteRecord('${item.id}')" class="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition" title="ລົບ">
-                            <i class="fa-regular fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function previewSelectedImage(e) {
-            const file = e.target.files[0];
-            if (file) {
-                selectedFile = file;
-                const reader = new FileReader();
-                reader.onload = function (evt) {
-                    document.getElementById('imagePreview').src = evt.target.result;
-                    document.getElementById('removeImgBtn').classList.remove('hidden');
-                    document.getElementById('removeImgBtn').classList.add('flex');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function clearImagePreview() {
-            selectedFile = null;
-            document.getElementById('imageFile').value = '';
-            document.getElementById('imagePreview').src = 'https://placehold.co/150x150/e2e8f0/64748b?text=Photo';
-            document.getElementById('removeImgBtn').classList.add('hidden');
-            document.getElementById('removeImgBtn').classList.remove('flex');
-        }
-
-        async function uploadImageToStorage(file) {
-            if (!dbClient) return null;
-            try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-                const filePath = `avatars/${fileName}`;
-
-                const { data, error } = await dbClient.storage
-                    .from('slips')
-                    .upload(filePath, file);
-
-                if (error) throw error;
-
-                const { data: publicUrlData } = dbClient.storage
-                    .from('slips')
-                    .getPublicUrl(filePath);
-
-                return publicUrlData.publicUrl;
-            } catch (err) {
-                console.error("Storage upload error:", err);
-                showToast("ອັບໂຫຼດຮູບເຂົ້າ Storage 'slips' ບໍ່ ສຳເລັດ", "error");
-                return null;
-            }
-        }
-
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-
-            const recordId = document.getElementById('recordId').value;
-            const entryDate = document.getElementById('entryDate').value;
-            const fullName = document.getElementById('fullName').value.trim();
-            const position = document.getElementById('position').value.trim();
-            const phoneNumber = document.getElementById('phoneNumber').value.trim();
-            const birthDate = document.getElementById('birthDate').value;
-            
-            if (!fullName || !position) {
-                showToast("ກະລຸນາປ້ອນຂໍ້ມູນທີ່ຈຳເປັນໃຫ້ຄົບຖ້ວນ", "error");
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>ກຳລັງບັນທຶກ...</span>`;
-            }
-
-            try {
-                let avatarUrl = document.getElementById('imagePreview').src;
-                if (avatarUrl.includes('placehold.co')) avatarUrl = '';
-
-                // If new file selected and connected to Supabase
-                if (selectedFile && dbClient) {
-                    const uploadedUrl = await uploadImageToStorage(selectedFile);
-                    if (uploadedUrl) avatarUrl = uploadedUrl;
-                }
-
-                const payload = {
-                    entry_date: entryDate,
-                    full_name: fullName,
-                    position: position,
-                    phone_number: phoneNumber,
-                    birth_date: birthDate || null,
-                    avatar_url: avatarUrl
-                };
-
-                if (dbClient) {
-                    if (isEditMode && recordId) {
-                        const { error } = await dbClient
-                            .from('profiles')
-                            .update(payload)
-                            .eq('id', recordId);
-                        if (error) throw error;
-                        showToast("ແກ້ໄຂຂໍ້ມູນສຳເລັດແລ້ວ!", "success");
-                    } else {
-                        const { error } = await dbClient
-                            .from('profiles')
-                            .insert([payload]);
-                        if (error) throw error;
-                        showToast("ບັນທຶກຂໍ້ມູນໃໝ່ສຳເລັດ!", "success");
-                    }
-                    await fetchRecords();
-                } else {
-                    // Fallback to local memory mock state
-                    if (isEditMode && recordId) {
-                        const idx = profileRecords.findIndex(r => r.id === recordId);
-                        if (idx !== -1) {
-                            profileRecords[idx] = { ...profileRecords[idx], ...payload };
-                        }
-                        showToast("ແກ້ໄຂຂໍ້ມູນໃນ Mock Data ສຳເລັດ!", "success");
-                    } else {
-                        const newRec = {
-                            id: Date.now().toString(),
-                            ...payload
-                        };
-                        profileRecords.unshift(newRec);
-                        showToast("ເພີ່ມຂໍ້ມູນໃໝ່ໃນ Mock Data ສຳເລັດ!", "success");
-                    }
-                    renderTable(profileRecords);
-                }
-
-                // Reset Form State without Reloading Page
-                resetFormState();
-
-            } catch (err) {
-                console.error("Form error:", err);
-                showToast("ເກີດຂໍ້ຜິດພາດ: " + err.message, "error");
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnHtml;
+                    supabaseClient = window.supabase.createClient(url, key);
+                } catch (e) {
+                    console.error("Supabase init error:", e);
                 }
             }
         }
 
-        function editRecord(id) {
-            const item = profileRecords.find(r => r.id === id);
-            if (!item) return;
+        function loadSavedConfigInputs() {
+            document.getElementById('cfgSystemTitle').value = localStorage.getItem('cfg_app_title') || DEFAULT_APP_TITLE;
+            document.getElementById('cfgSystemSubtitle').value = localStorage.getItem('cfg_app_subtitle') || DEFAULT_APP_SUBTITLE;
+            document.getElementById('cfgThemeColor').value = localStorage.getItem('cfg_theme_color') || DEFAULT_THEME_COLOR;
 
-            isEditMode = true;
-            document.getElementById('recordId').value = item.id;
-            document.getElementById('entryDate').value = item.entry_date || '';
-            document.getElementById('fullName').value = item.full_name || '';
-            document.getElementById('position').value = item.position || '';
-            document.getElementById('phoneNumber').value = item.phone_number || '';
-            document.getElementById('birthDate').value = item.birth_date || '';
-
-            if (item.avatar_url) {
-                document.getElementById('imagePreview').src = item.avatar_url;
-                document.getElementById('removeImgBtn').classList.remove('hidden');
-                document.getElementById('removeImgBtn').classList.add('flex');
-            } else {
-                clearImagePreview();
-            }
-
-            // Safe UI updates
-            const formTitle = document.getElementById('formTitle');
-            if (formTitle) formTitle.textContent = 'ແກ້ໄຂຂໍ້ມູນພະນັກງານ';
-
-            const formIcon = document.getElementById('formIcon');
-            if (formIcon) formIcon.className = 'fa-solid fa-user-pen text-amber-600 text-lg';
-
-            const editBadge = document.getElementById('editBadge');
-            if (editBadge) editBadge.classList.remove('hidden');
-
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.className = 'flex-1 bg-amber-600 hover:bg-amber-500 text-white font-medium py-2.5 px-4 rounded-xl shadow-md shadow-amber-600/20 text-sm transition flex items-center justify-center space-x-2';
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span id="btnText">ອັບເດດຂໍ້ມູນ</span>`;
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        async function deleteRecord(id) {
-            if (!confirm("ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລົບຂໍ້ມູນນີ້?")) return;
-
-            try {
-                if (dbClient) {
-                    const { error } = await dbClient
-                        .from('profiles')
-                        .delete()
-                        .eq('id', id);
-                    if (error) throw error;
-                    showToast("ລົບຂໍ້ມູນສຳເລັດ!", "success");
-                    await fetchRecords();
-                } else {
-                    profileRecords = profileRecords.filter(r => r.id !== id);
-                    renderTable(profileRecords);
-                    showToast("ລົບຂໍ້ມູນໃນ Mock Data ສຳເລັດ!", "success");
-                }
-            } catch (err) {
-                showToast("ບໍ່ສາມາດລົບຂໍ້ມູນໄດ້: " + err.message, "error");
-            }
-        }
-
-        function resetFormState() {
-            isEditMode = false;
-            const profileForm = document.getElementById('profileForm');
-            if (profileForm) profileForm.reset();
-
-            const recordId = document.getElementById('recordId');
-            if (recordId) recordId.value = '';
-
-            const entryDate = document.getElementById('entryDate');
-            if (entryDate) entryDate.valueAsDate = new Date();
-
-            clearImagePreview();
-
-            // Safe UI element resets
-            const formTitle = document.getElementById('formTitle');
-            if (formTitle) formTitle.textContent = 'ເພີ່ມຂໍ້ມູນພະນັກງານ';
-
-            const formIcon = document.getElementById('formIcon');
-            if (formIcon) formIcon.className = 'fa-solid fa-user-plus text-sky-600 text-lg';
-
-            const editBadge = document.getElementById('editBadge');
-            if (editBadge) editBadge.classList.add('hidden');
-
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.className = 'flex-1 bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 px-4 rounded-xl shadow-md shadow-sky-600/20 text-sm transition flex items-center justify-center space-x-2';
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> <span id="btnText">ບັນທຶກຂໍ້ມູນ</span>`;
-            }
-        }
-
-        function filterRecords() {
-            const query = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!query) {
-                renderTable(profileRecords);
-                return;
-            }
-            const filtered = profileRecords.filter(item => 
-                (item.full_name && item.full_name.toLowerCase().includes(query)) ||
-                (item.position && item.position.toLowerCase().includes(query)) ||
-                (item.phone_number && item.phone_number.toLowerCase().includes(query))
-            );
-            renderTable(filtered);
-        }
-
-        function saveSupabaseConfig() {
-            const url = document.getElementById('configUrl').value.trim();
-            const key = document.getElementById('configKey').value.trim();
-
-            if (!url || !key) {
-                showToast("ກະລຸນາປ້ອນ URL ແລະ Key ໃຫ້ຄົບ", "error");
-                return;
-            }
-
-            localStorage.setItem('sp_url', url);
-            localStorage.setItem('sp_key', key);
-
-            initSupabaseClient(url, key);
-            toggleConfigModal();
-            showToast("ບັນທຶກການຕັ້ງຄ່າ API ສຳເລັດ!", "success");
+            document.getElementById('cfgSupabaseUrl').value = localStorage.getItem('cfg_supabase_url') || DEFAULT_SUPABASE_URL;
+            document.getElementById('cfgSupabaseKey').value = localStorage.getItem('cfg_supabase_key') || DEFAULT_SUPABASE_KEY;
+            document.getElementById('cfgGasUrl').value = localStorage.getItem('cfg_gas_url') || '';
         }
 
         function toggleConfigModal() {
@@ -867,70 +576,377 @@ NOTIFY pgrst, 'reload schema';`;
             modal.classList.toggle('hidden');
         }
 
-        function toggleSqlModal() {
-            const modal = document.getElementById('sqlModal');
-            modal.classList.toggle('hidden');
+        function saveConfig() {
+            const appTitle = document.getElementById('cfgSystemTitle').value.trim() || DEFAULT_APP_TITLE;
+            const appSubtitle = document.getElementById('cfgSystemSubtitle').value.trim() || DEFAULT_APP_SUBTITLE;
+            const themeColor = document.getElementById('cfgThemeColor').value || DEFAULT_THEME_COLOR;
+
+            const url = document.getElementById('cfgSupabaseUrl').value.trim();
+            const key = document.getElementById('cfgSupabaseKey').value.trim();
+            const gasUrl = document.getElementById('cfgGasUrl').value.trim();
+
+            localStorage.setItem('cfg_app_title', appTitle);
+            localStorage.setItem('cfg_app_subtitle', appSubtitle);
+            localStorage.setItem('cfg_theme_color', themeColor);
+
+            localStorage.setItem('cfg_supabase_url', url);
+            localStorage.setItem('cfg_supabase_key', key);
+            localStorage.setItem('cfg_gas_url', gasUrl);
+
+            applyThemeAndTitle();
+            initSupabase();
+            toggleConfigModal();
+            alert("ບັນທຶກການຕັ້ງຄ່າ ແລະ ປ່ຽນຮູບແບບລະບົບຮຽບຮ້ອຍແລ້ວ!");
         }
 
-        function copySqlToClipboard() {
-            const sqlText = document.getElementById('sqlCodeBlock').textContent;
+        function switchTab(tab) {
+            const regTab = document.getElementById('tabRegister');
+            const scanTab = document.getElementById('tabScan');
+            const regBtn = document.getElementById('tabRegisterBtn');
+            const scanBtn = document.getElementById('tabScanBtn');
+
+            if (tab === 'register') {
+                regTab.classList.remove('hidden');
+                scanTab.classList.add('hidden');
+
+                regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all duration-200 flex items-center justify-center space-x-2";
+                scanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-700 transition-all duration-200 flex items-center justify-center space-x-2";
+                
+                stopScanner();
+            } else {
+                regTab.classList.add('hidden');
+                scanTab.classList.remove('hidden');
+
+                scanBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all duration-200 flex items-center justify-center space-x-2";
+                regBtn.className = "flex-1 py-2.5 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-700 transition-all duration-200 flex items-center justify-center space-x-2";
+            }
+        }
+
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById(previewId);
+                    img.src = e.target.result;
+                    document.getElementById(previewId + 'Container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearImage(inputId, containerId) {
+            document.getElementById(inputId).value = "";
+            document.getElementById(containerId).classList.add('hidden');
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve("");
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
             
-            // execCommand fallback for iFrame compatibility
-            const textarea = document.createElement('textarea');
-            textarea.value = sqlText;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>ກຳລັງບັນທຶກ...</span>`;
 
-            const btnText = document.getElementById('copyBtnText');
-            btnText.textContent = "ກັອບປີ້ແລ້ວ!";
-            setTimeout(() => { btnText.textContent = "ກັອບປີ້ SQL"; }, 2000);
-            showToast("ກັອບປີ້ SQL Script ໄປ clipboard ແລ້ວ!", "success");
+            try {
+                const regId = 'REG-' + Math.floor(100000 + Math.random() * 900000);
+                const fullName = document.getElementById('fullName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const category = document.querySelector('input[name="category"]:checked').value;
+                const rewards = document.getElementById('rewards').value.trim();
+
+                const idCardFile = document.getElementById('idCardInput').files[0];
+                const storeFile = document.getElementById('storeInput').files[0];
+
+                const idCardBase64 = idCardFile ? await fileToBase64(idCardFile) : "";
+                const storeBase64 = storeFile ? await fileToBase64(storeFile) : "";
+
+                const payload = {
+                    id: regId,
+                    full_name: fullName,
+                    phone: phone,
+                    category: category,
+                    rewards: rewards,
+                    id_card_url: idCardBase64,
+                    store_url: storeBase64,
+                    status: 'ຍັງບໍ່ທັນຮັບ'
+                };
+
+                // 1. Save to Supabase
+                if (supabaseClient) {
+                    const { error } = await supabaseClient
+                        .from('registrations')
+                        .insert([payload]);
+                    
+                    if (error) {
+                        console.error("Supabase insert error:", error);
+                    }
+                }
+
+                // 2. Save to Google Apps Script (if configured)
+                const gasUrl = localStorage.getItem('cfg_gas_url');
+                if (gasUrl && window.google && google.script && google.script.run) {
+                    google.script.run.saveToSheet(payload);
+                }
+
+                // Display Result QR
+                showRegistrationSuccess(payload);
+
+            } catch (err) {
+                alert("ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກ: " + err.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane text-xs"></i> <span>ບັນທຶກ ແລະ ສ້າງ QR Code</span>`;
+            }
         }
 
-        function showToast(msg, type = "success") {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
+        function showRegistrationSuccess(data) {
+            document.getElementById('regForm').classList.add('hidden');
+            const resCard = document.getElementById('resultCard');
+            resCard.classList.remove('hidden');
 
-            toastMsg.textContent = msg;
+            document.getElementById('displayRegId').innerText = data.id;
+            document.getElementById('resName').innerText = data.full_name;
+            document.getElementById('resPhone').innerText = data.phone;
+            document.getElementById('resCat').innerText = data.category;
 
-            if (type === "error") {
-                toastIcon.className = "fa-solid fa-circle-exclamation text-rose-400 text-base";
-            } else {
-                toastIcon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = "";
+            new QRCode(qrcodeContainer, {
+                text: data.id,
+                width: 160,
+                height: 160,
+                colorDark: "#4f46e5",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function resetRegForm() {
+            document.getElementById('regForm').reset();
+            clearImage('idCardInput', 'idCardPreviewContainer');
+            clearImage('storeInput', 'storePreviewContainer');
+            document.getElementById('regForm').classList.remove('hidden');
+            document.getElementById('resultCard').classList.add('hidden');
+        }
+
+        function resetScannerUI() {
+            const placeholder = document.getElementById('scannerPlaceholder');
+            const startBtn = document.getElementById('startScanBtn');
+            const stopBtn = document.getElementById('stopScanBtn');
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (startBtn) startBtn.classList.remove('hidden');
+            if (stopBtn) stopBtn.classList.add('hidden');
+        }
+
+        async function stopScanner() {
+            if (!html5QrcodeScanner) {
+                resetScannerUI();
+                return;
             }
 
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+            const scanner = html5QrcodeScanner;
+            html5QrcodeScanner = null;
 
+            try {
+                const SCANNING = window.Html5QrcodeScannerState ? window.Html5QrcodeScannerState.SCANNING : 2;
+                const PAUSED = window.Html5QrcodeScannerState ? window.Html5QrcodeScannerState.PAUSED : 3;
+                const state = scanner.getState();
+
+                if (state === SCANNING || state === PAUSED) {
+                    await scanner.stop().catch(err => console.warn("Scanner stop warning:", err));
+                }
+                try {
+                    scanner.clear();
+                } catch (e) {
+                    // Ignore clear error if already cleared
+                }
+            } catch (err) {
+                console.warn("Scanner cleanup warning:", err);
+            } finally {
+                resetScannerUI();
+            }
+        }
+
+        async function startScanner() {
+            await stopScanner();
+
+            document.getElementById('scannerPlaceholder').classList.add('hidden');
+            document.getElementById('startScanBtn').classList.add('hidden');
+            document.getElementById('stopScanBtn').classList.remove('hidden');
+
+            try {
+                html5QrcodeScanner = new Html5Qrcode("reader");
+                const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+                await html5QrcodeScanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+            } catch (err) {
+                alert("ບໍ່ສາມາດເປີດກ້ອງໄດ້: " + (err.message || err));
+                await stopScanner();
+            }
+        }
+
+        async function onScanSuccess(decodedText) {
+            await stopScanner();
+            fetchRecordAndVerify(decodedText);
+        }
+
+        function onScanFailure(error) {
+            // Ignore scan attempt failures
+        }
+
+        async function scanQRFromFile(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            
+            // Stop camera if running
+            await stopScanner();
+
+            try {
+                const html5QrCode = new Html5Qrcode("reader");
+                const decodedText = await html5QrCode.scanFile(file, true);
+                fetchRecordAndVerify(decodedText);
+            } catch (err) {
+                alert("ບໍ່ສາມາດອ່ານ QR Code ຈາກຮູບນີ້ໄດ້ (ກະລຸນາກວດສອບວ່າຮູບພາບຊັດເຈນ ແລະ ມີ QR Code)");
+            } finally {
+                input.value = "";
+            }
+        }
+
+        function searchManualId() {
+            const id = document.getElementById('manualIdInput').value.trim();
+            if (!id) return alert("ກະລຸນາປ້ອນ ID");
+            fetchRecordAndVerify(id);
+        }
+
+        async function fetchRecordAndVerify(regId) {
+            if (!supabaseClient) {
+                alert("ລະບົບຍັງບໍ່ທັນໄດ້ເຊື່ອມຕໍ່ Supabase");
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('registrations')
+                    .select('*')
+                    .eq('id', regId)
+                    .single();
+
+                if (error || !data) {
+                    alert("ບໍ່ພົບຂໍ້ມູນ ID: " + regId);
+                    return;
+                }
+
+                currentRecord = data;
+                displayVerifyData(data);
+
+            } catch (e) {
+                alert("ເກີດຂໍ້ຜິດພາດ: " + e.message);
+            }
+        }
+
+        function displayVerifyData(data) {
+            const card = document.getElementById('verifyResultCard');
+            card.classList.remove('hidden');
+
+            document.getElementById('vRegId').innerText = data.id;
+            document.getElementById('vName').innerText = data.full_name;
+            document.getElementById('vPhone').innerText = data.phone;
+            document.getElementById('vCategory').innerText = data.category;
+            document.getElementById('vRewards').innerText = data.rewards;
+
+            // Images
+            const idImg = document.getElementById('vIdCardImg');
+            const storeImg = document.getElementById('vStoreImg');
+            
+            if (data.id_card_url) {
+                idImg.src = data.id_card_url;
+                document.getElementById('vIdCardBox').classList.remove('hidden');
+            } else {
+                document.getElementById('vIdCardBox').classList.add('hidden');
+            }
+
+            if (data.store_url) {
+                storeImg.src = data.store_url;
+                document.getElementById('vStoreBox').classList.remove('hidden');
+            } else {
+                document.getElementById('vStoreBox').classList.add('hidden');
+            }
+
+            // Status Badge & Button
+            const badge = document.getElementById('vStatusBadge');
+            const confirmBtn = document.getElementById('confirmClaimBtn');
+
+            const isAlreadyClaimed = data.status && data.status.includes('ຮັບເຄື່ອງແລ້ວ');
+
+            if (isAlreadyClaimed) {
+                badge.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700";
+                badge.innerText = "ຮັບເຄື່ອງແລ້ວ ✅";
+                confirmBtn.classList.add('hidden');
+            } else {
+                badge.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700";
+                badge.innerText = "ຍັງບໍ່ທັນຮັບ";
+                confirmBtn.classList.remove('hidden');
+            }
+
+            // Auto scroll to make sure the confirm button is fully visible
             setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+                confirmBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }, 100);
         }
 
-        function showLoading(show) {
-            const loading = document.getElementById('loadingState');
-            if (show) {
-                loading.classList.remove('hidden');
-            } else {
-                loading.classList.add('hidden');
+        function hideVerifyResult() {
+            document.getElementById('verifyResultCard').classList.add('hidden');
+            currentRecord = null;
+        }
+
+        async function confirmReceipt() {
+            if (!currentRecord || !supabaseClient) return;
+
+            const confirmBtn = document.getElementById('confirmClaimBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>ກຳລັງຢືນຢັນ...</span>`;
+
+            try {
+                // Update status in Supabase
+                const { error } = await supabaseClient
+                    .from('registrations')
+                    .update({ status: 'ຮັບເຄື່ອງແລ້ວ ✅' })
+                    .eq('id', currentRecord.id);
+
+                if (error) {
+                    throw error;
+                }
+
+                // Update status in Google Sheets (if integrated)
+                const gasUrl = localStorage.getItem('cfg_gas_url');
+                if (gasUrl && window.google && google.script && google.script.run) {
+                    google.script.run.updateStatusInSheet(currentRecord.id, 'ຮັບເຄື່ອງແລ້ວ ✅');
+                }
+
+                currentRecord.status = 'ຮັບເຄື່ອງແລ້ວ ✅';
+                displayVerifyData(currentRecord);
+                alert("ຢືນຢັນການຮັບເຄື່ອງສຳເລັດແລ້ວ!");
+
+            } catch (err) {
+                alert("ເກີດຂໍ້ຜິດພາດ: " + err.message);
+            } finally {
+                confirmBtn.disabled = false;
             }
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
         }
     </script>
 </body>
 </html>
-
-
