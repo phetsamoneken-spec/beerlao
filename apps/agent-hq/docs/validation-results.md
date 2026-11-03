@@ -25,3 +25,13 @@ A browser run with WebGL disabled selected an alternative graphics renderer rath
 - Existing workflow tests additionally exercise changing and persisting a chibi avatar. Local same-origin blob URLs used by the image decoder are allowed by the network assertion; external service requests remain disallowed.
 
 These checks validate interactive UI behavior with test records. They do not connect a real AI, Google service, or production database. Original art assets remain in `src/assets`; the image-generation source files are retained outside the project under `/workspace/generated_images`.
+
+## Local file upload feature
+
+- TypeScript/Vite production build and Pages subpath packaging: passed.
+- `tests/uploads.py`: passed multi-file chooser, drag/drop, IndexedDB persistence across reload, SHA-256 duplicate handling, exact original download bytes, escaped Lao text preview, image preview, type/size/empty/batch checks, persistent employee/category assignment, employee-specific file views, nested preview Escape handling, cancel/confirm deletion and blocked-storage error reporting.
+- The same test verifies existing agents/tasks/messages are unchanged and no file POST requests are sent.
+- Lao mobile layout: passed at 390px with no page overflow.
+- Existing `tests/smoke.py`: passed agent configuration/persistence, input gates, local drafts, rejection/retry, approval, approved exports, audit history, chat and mobile navigation.
+
+File contents remain in the current browser's IndexedDB; no GitHub/Drive storage, AI parsing or cross-user file sharing is implemented. Upload test data is fictional and generated screenshots/downloads are ignored by Git.

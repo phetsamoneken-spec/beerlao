@@ -52,3 +52,14 @@ ORBIT_BASE_URL=http://127.0.0.1:8077/orbit-office-preview.html python3 tests/smo
 - [ ] Public deployment (requires explicit admin approval; not performed).
 
 Phase 1 is usable as a local visual prototype and keeps all execution labeled as a simulation. The preserved prior backend design/schema documents are proposals, not deployed integrations. Current local toggles and Demo Admin are not production security controls.
+
+## Local file library
+
+- [x] File picker and drag/drop, up to ten files per batch and 20 MB per file.
+- [x] PDF/Word/Excel/CSV/text/JSON/Markdown and common raster image storage.
+- [x] IndexedDB blob/metadata transactions and duplicate detection.
+- [x] Employee and purpose assignment, search/filter, safe text/image preview and unchanged original download.
+- [x] Confirmed single-file removal, reload persistence, mobile layout and storage-error feedback.
+- [x] Original agent/task state preserved; JSON backup limitation stated in settings.
+- [ ] Cloud file storage and Google Drive synchronization (still not connected).
+- [ ] Real AI file reading, document parsing and provider-side permission enforcement.

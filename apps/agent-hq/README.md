@@ -34,6 +34,20 @@ The current scene follows the user's chibi-studio reference: a glass-walled city
 
 **Team Meeting** opens a roster of existing employees with workspace links. It does not simulate an AI meeting or complete tasks. **Coffee Corner** focuses the camera on the lounge; it has no task side effects. Both areas are also clickable in the room. No provider logos or “100% synced” claims from the reference were copied into this unconnected prototype.
 
+## Upload documents and templates
+
+Open **Documents → Upload files**, or an employee's **Files & templates** tab. Select files or drop them onto the upload area; choose their purpose and optional employee assignment. Supported: PDF, DOC/DOCX, XLS/XLSX, CSV, TXT/MD/JSON, PNG/JPEG/WebP/GIF. Each file is limited to 20 MB; select up to ten per batch.
+
+Files and metadata persist in IndexedDB (`agent-hq-files-v1`) in the current browser profile and origin. Uploading makes no network POST and does not publish files in GitHub or transfer them to Google Drive or AI. Existing agent configurations and tasks remain in their original local storage; uploaded bytes are stored separately. Identical file content is detected using SHA-256 and is not silently overwritten or reassigned. An accepted file appears only after its metadata and blob transaction commits. Failed or rejected files do not remove existing entries.
+
+Images and UTF-8 text/CSV/JSON can be previewed. Text is rendered as escaped text. PDF and Office files can be downloaded byte-for-byte for opening in another app; no PDF/Office parsing or AI extraction is claimed. Metadata settings do not modify file contents. File removal asks for confirmation and only removes the browser copy. The workspace JSON backup does not contain uploaded files: download originals separately before moving browser profiles/origins or clearing site data.
+
+For functional validation against the running local site:
+
+```sh
+ORBIT_BASE_URL=http://127.0.0.1:8077/beerlao/agent-hq/ python3 tests/uploads.py
+```
+
 ## New office and CEO
 
 Click the CEO to open Command Chat, Agent Assignment, Task Monitoring, Pending Approvals and Recent Reports. Budget, BAF and sales commands propose the mapped active employee; unknown/multiple categories request clarification. Review delegation, then provide the normal required fields before creating a task. Change mappings using saved employee IDs in Agent Assignment. Existing names/configurations are not rewritten to AI 1/2/3.

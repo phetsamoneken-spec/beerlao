@@ -74,3 +74,7 @@ Budget/BAF use admin-approved DOCX templates with typed placeholder mappings and
 3. Implement OAuth, Picker, read-only source adapters, data preview/mapping, token revocation and permission tests.
 4. Add provider abstraction, job queue, typed output validation, DOCX/PDF/XLSX renderers and revision-bound approvals.
 5. Validate all starter workflows against authorized sample templates and sales data; test Lao/Thai fonts, real missing inputs, denied access, retries and exact output calculations. Deploy only after explicit admin approval.
+
+## Browser file library
+
+`src/uploads.ts` owns IndexedDB access and `src/FileLibrary.tsx` owns upload/preview UI. The new database is separate from `orbit-office-v1` and never migrates, resets or rewrites existing agent/task data. Stores `metadata` (unique hash index) and `contents` are updated together in read/write transactions for upload and removal; blobs are fetched only when previewing/downloading. Metadata assignment only changes the file record and is not an access-control grant or an AI input pipeline. Storage errors are reported without reporting an uncommitted upload as successful. Browser quota and profile lifetime determine retention. No backend endpoints, credentials or third-party upload packages are involved.
