@@ -1,3 +1,5 @@
+> **Phase 2 review branch:** see [implementation, variables, tests and approval gates](docs/phase2.md) and [Google Drive OAuth design](docs/google-drive-phase2.md). Cloud mode is disabled by default; local demo behavior below remains available. No published files or production services are changed by this branch.
+
 # GitHub Pages publication
 
 This app is published at **https://phetsamoneken-spec.github.io/beerlao/agent-hq/**.

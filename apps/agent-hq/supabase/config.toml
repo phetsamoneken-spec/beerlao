@@ -1,0 +1,4 @@
+# Local configuration only. Do not link, push, reset or deploy a remote project without approval.
+project_id = "agent-hq-phase2-local"
+[functions.agent-api]
+verify_jwt = true

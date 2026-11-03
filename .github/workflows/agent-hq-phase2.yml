@@ -1,0 +1,26 @@
+name: AGENT HQ Phase 2 review checks
+on:
+  pull_request:
+    paths:
+      - 'apps/agent-hq/**'
+      - '.github/workflows/agent-hq-phase2.yml'
+permissions:
+  contents: read
+jobs:
+  isolated-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/agent-hq
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/agent-hq/package-lock.json
+      - run: npm ci
+      - run: npm run test:phase2
+      - run: npm run check:edge
+      - run: npm run build
+# Deliberately no deployment, database link, remote migration or secret-bearing job.

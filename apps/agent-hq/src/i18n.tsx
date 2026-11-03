@@ -6,7 +6,7 @@ const dictionary: Record<string, string> = lao;
 export function translate(language: Language, key: string, values: Record<string,string|number> = {}) {
  let text = language === 'lo' ? dictionary[key] ?? key : key;
  if(language==='lo' && !dictionary[key]){
-  for(const prefix of ['Waiting for required inputs: ','Required fields missing: ','Reviewer rejected draft: ']){
+  for(const prefix of ['Waiting for required inputs: ','Required fields missing: ','Reviewer rejected draft: ','NEEDS_INFORMATION: ']){
    if(key.startsWith(prefix)){text=dictionary[prefix]+key.slice(prefix.length).split(', ').map(part=>dictionary[part]??part).join(', ');break;}
   }
  }

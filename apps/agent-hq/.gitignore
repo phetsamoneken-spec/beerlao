@@ -4,3 +4,8 @@ dist/
 tests/artifacts/
 __pycache__/
 *.tsbuildinfo
+
+.env
+.env.*
+!.env.example
+.deno/

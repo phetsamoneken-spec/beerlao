@@ -1,9 +1,11 @@
-import { build } from 'vite';
+import { assertPublicEnvironment } from './public-env.mjs';
+import { build, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
+assertPublicEnvironment({...process.env,...loadEnv('production',process.cwd(),'')});
 // Inline the complete application so a downloaded file opens without a server.
 const result = await build({
   configFile: false,
