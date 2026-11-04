@@ -37,7 +37,7 @@ old public.memberships;
 begin perform pg_advisory_xact_lock(hashtextextended(org::text,1));
 if private.role_in(org) is distinct from 'admin' then raise exception 'FORBIDDEN';
 end if;
-if new_role not in ('admin','manager','member') or coalesce(length(dept),0) not between 1 and 100 then raise exception 'INVALID_INPUT';
+if new_role is null or new_role not in ('admin','manager','member') or is_active is null or coalesce(length(dept),0) not between 1 and 100 then raise exception 'INVALID_INPUT';
 end if;
 select * into old from public.memberships where organization_id=org and user_id=target_user;
 if old.role='admin' and old.active and (not is_active or new_role<>'admin') and (select count(*) from public.memberships where organization_id=org and role='admin' and active)<=1 then raise exception 'LAST_ADMIN';
@@ -47,14 +47,89 @@ insert into public.memberships(organization_id,user_id,role,department,active) v
 insert into public.audit_events(organization_id,department,actor_id,action,metadata) values(org,dept,uid,'membership.updated',jsonb_build_object('user_id',target_user,'role',new_role,'active',is_active));
 end$$;
 
+-- The Edge validator is not the only entry point: authenticated clients can call
+-- these RPCs through PostgREST. Validate stored configuration here as well.
+create function private.validate_agent_configuration(config jsonb) returns jsonb
+language plpgsql immutable set search_path='' as $$
+declare
+  spec record;
+  value text;
+  item jsonb;
+begin
+  if jsonb_typeof(config) is distinct from 'object' or octet_length(config::text)>65536 then
+    raise exception 'INVALID_INPUT';
+  end if;
+  if exists(select 1 from jsonb_object_keys(config) as keys(name) where name<>all(array[
+    'id','name','title','department','color','avatar','active','description','prompt',
+    'responsibilities','allowedTasks','restrictedTasks','workflow','requirements',
+    'language','folder','files','spreadsheet','tabs','ranges','templates',
+    'additionalSources','formats','permissions','access','fields'
+  ])) then raise exception 'INVALID_INPUT';end if;
+  for spec in select * from (values
+    ('id',100,false),('name',100,true),('title',160,true),('department',100,true),
+    ('color',7,false),('avatar',20,false),('description',2000,false),('prompt',12000,true),
+    ('responsibilities',6000,false),('allowedTasks',4000,false),('restrictedTasks',4000,false),
+    ('workflow',6000,false),('requirements',6000,false),('language',7,false),
+    ('folder',1000,false),('files',4000,false),('spreadsheet',1000,false),('tabs',1000,false),
+    ('ranges',1000,false),('templates',4000,false),('additionalSources',4000,false),
+    ('access',2000,false),('fields',2000,false)
+  ) as limits(field_name,max_length,required_text) loop
+    if jsonb_typeof(config->spec.field_name) is distinct from 'string' then
+      raise exception 'INVALID_INPUT';
+    end if;
+    value:=config->>spec.field_name;
+    if spec.required_text then
+      value:=btrim(value,E' \t\n\r\f\013');
+      if length(value)=0 then raise exception 'INVALID_INPUT';end if;
+      config:=jsonb_set(config,array[spec.field_name],to_jsonb(value));
+    end if;
+    if length(value)>spec.max_length then raise exception 'INVALID_INPUT';end if;
+  end loop;
+  if jsonb_typeof(config->'active') is distinct from 'boolean'
+     or (config->>'color')!~'^#[0-9a-fA-F]{6}$'
+     or config->>'avatar' not in ('robot','orb','capsule','chibi-mint','chibi-violet','chibi-amber')
+     or config->>'language' not in ('Lao','Thai','English') then
+    raise exception 'INVALID_INPUT';
+  end if;
+  if jsonb_typeof(config->'formats') is distinct from 'array'
+     or jsonb_typeof(config->'permissions') is distinct from 'array' then
+    raise exception 'INVALID_INPUT';
+  end if;
+  if jsonb_array_length(config->'formats')>10 or jsonb_array_length(config->'permissions')>5 then
+    raise exception 'INVALID_INPUT';
+  end if;
+  for item in select * from jsonb_array_elements(config->'formats') loop
+    if jsonb_typeof(item)<>'string' or length(item#>>'{}')>80 then raise exception 'INVALID_INPUT';end if;
+  end loop;
+  for item in select * from jsonb_array_elements(config->'permissions') loop
+    if jsonb_typeof(item)<>'string' or item#>>'{}' not in (
+      'Read data','Generate drafts','Export documents','Save approved documents','Request human approval'
+    ) then raise exception 'INVALID_INPUT';end if;
+  end loop;
+  return config;
+end$$;
+
+create function private.validate_task_inputs(inputs jsonb) returns void
+language plpgsql immutable set search_path='' as $$
+begin
+  if jsonb_typeof(inputs) is distinct from 'object' or octet_length(inputs::text)>65536 then
+    raise exception 'INVALID_INPUT';
+  end if;
+  if exists(select 1 from jsonb_object_keys(inputs) as keys(name) where length(name)>200) then
+    raise exception 'INVALID_INPUT';
+  end if;
+end$$;
+
 create function public.save_agent(org uuid,agent uuid,expected_revision integer,agent_kind text,config jsonb) returns public.agents language plpgsql security definer set search_path='' as $$
 declare uid uuid:=private.require_user();
 row public.agents;
 dept text:=config->>'department';
 begin if private.role_in(org) is distinct from 'admin' then raise exception 'FORBIDDEN';
 end if;
-if jsonb_typeof(config)<>'object' or coalesce(length(config->>'name'),0) not between 1 and 100 or coalesce(length(config->>'prompt'),0) not between 1 and 12000 or coalesce(length(dept),0) not between 1 and 100 or jsonb_typeof(config->'permissions') is distinct from 'array' then raise exception 'INVALID_INPUT';
-end if;
+if agent_kind is null or agent_kind not in ('ceo','budget','baf','sales','marketing','custom')
+  or (agent is null and expected_revision is not null) then raise exception 'INVALID_INPUT';end if;
+config:=private.validate_agent_configuration(config);
+dept:=config->>'department';
 perform private.rate_limit('write',60);
 if agent is null then insert into public.agents(organization_id,department,name,kind,active,configuration) values(org,dept,config->>'name',agent_kind,coalesce((config->>'active')::boolean,false),config) returning * into row;
 else select * into row from public.agents where organization_id=org and id=agent for update;
@@ -78,6 +153,9 @@ t public.tasks;
 begin select * into a from public.agents where organization_id=org and id=agent;
 if a.id is null or not a.active or not private.department_access(org,a.department) then raise exception 'FORBIDDEN';
 end if;
+task_title:=btrim(task_title,E' \t\n\r\f\013');
+if coalesce(length(task_title),0) not between 1 and 240 then raise exception 'INVALID_INPUT';end if;
+perform private.validate_task_inputs(task_inputs);
 perform private.rate_limit('task',20);
 insert into public.tasks(organization_id,department,agent_id,agent_revision,requester_id,title,inputs) values(org,a.department,a.id,a.revision,uid,task_title,task_inputs) returning * into t;
 insert into public.audit_events(organization_id,department,actor_id,task_id,action) values(org,a.department,uid,t.id,'task.created');
@@ -101,6 +179,7 @@ v public.agent_revisions;
 missing jsonb;
 begin if not private.task_access(org,tid) then raise exception 'FORBIDDEN';
 end if;
+if key is null then raise exception 'INVALID_INPUT';end if;
 select * into t from public.tasks where organization_id=org and id=tid for update;
 -- Reclaim only expired runs during an explicit retry. Never replay a provider call automatically.
 if t.status='In progress' and exists(select 1 from public.ai_runs where organization_id=org and task_id=tid and status='running' and started_at<now()-interval '5 minutes') then
@@ -136,6 +215,7 @@ end if;
 select * into t from public.tasks where organization_id=org and id=tid for update;
 if t.status in ('In progress','Approved','Completed') then raise exception 'INVALID_TRANSITION';
 end if;
+perform private.validate_task_inputs(new_inputs);
 perform private.rate_limit('write',60);
 update public.tasks set inputs=new_inputs,status='New',current_draft_id=null,updated_at=now() where organization_id=org and id=tid;
 insert into public.audit_events(organization_id,department,actor_id,task_id,action) values(org,t.department,uid,tid,'task.inputs_updated');
@@ -196,7 +276,7 @@ select * into t from public.tasks where organization_id=org and id=tid for updat
 select * into d from public.drafts where organization_id=org and id=draft and task_id=tid;
 if t.status<>'Awaiting approval' or t.current_draft_id is distinct from draft or d.content_hash is distinct from expected_hash then raise exception 'STALE_REVIEW';
 end if;
-if decision_value not in ('approved','rejected') or (decision_value='rejected' and btrim(reason_value)='') then raise exception 'INVALID_INPUT';
+if decision_value is null or decision_value not in ('approved','rejected') or reason_value is null or length(reason_value)>2000 or (decision_value='rejected' and btrim(reason_value,E' \t\n\r\f\013')='') then raise exception 'INVALID_INPUT';
 end if;
 perform private.rate_limit('write',60);
 insert into public.reviews(organization_id,draft_id,reviewer_id,content_hash,decision,reason) values(org,draft,uid,expected_hash,decision_value,reason_value) returning id into rid;

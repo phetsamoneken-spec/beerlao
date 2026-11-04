@@ -504,3 +504,171 @@ test("drafts, runs, reviews, artifacts, sources and audits inherit tenant/depart
       }}
   }
 });
+
+test("direct agent RPC rejects malformed configuration before inserting data", async () => {
+  await who(0);
+  const baseline = await one("select count(*)::int n from public.agents");
+  const invalid: unknown[] = [
+    null,
+    [],
+    {
+      name: "Partial",
+      prompt: "Only some fields",
+      department: "sales",
+      permissions: [],
+    },
+    { ...config("Invalid"), active: "false" },
+    { ...config("Invalid"), fields: ["Shop name"] },
+    { ...config("Invalid"), permissions: ["Unrestricted external writes"] },
+    { ...config("Invalid"), permissions: Array(6).fill("Generate drafts") },
+    { ...config("Invalid"), formats: "PDF" },
+    { ...config("Invalid"), formats: [42] },
+    { ...config("Invalid"), formats: Array(11).fill("PDF") },
+    { ...config("Invalid"), language: "Unknown" },
+    { ...config("Invalid"), avatar: "unknown" },
+    { ...config("Invalid"), color: "url(https://attacker.example/track)" },
+    { ...config("Invalid"), prompt: " \t\n " },
+    { ...config("Invalid"), fields: "x".repeat(2001) },
+    { ...config("Invalid"), unexpectedSecret: "must not be stored" },
+  ];
+  for (const configuration of invalid) {
+    await denied("select public.save_agent($1,null,null,$2,$3::jsonb)", [
+      A,
+      "budget",
+      JSON.stringify(configuration),
+    ], /INVALID_INPUT/);
+  }
+  for (const kind of [null, "unrestricted"]) {
+    await denied("select public.save_agent($1,null,null,$2,$3::jsonb)", [
+      A,
+      kind,
+      JSON.stringify(config("Invalid")),
+    ], /INVALID_INPUT/);
+  }
+  await denied("select public.save_agent($1,null,1,$2,$3::jsonb)", [
+    A,
+    "budget",
+    JSON.stringify(config("Invalid")),
+  ], /INVALID_INPUT/);
+  assert.equal(
+    (await one("select count(*)::int n from public.agents"))!.n,
+    baseline!.n,
+  );
+});
+
+test("direct agent RPC normalizes required text and keeps all supported portraits and instructions", async () => {
+  await who(0);
+  for (
+    const avatar of [
+      "robot",
+      "orb",
+      "capsule",
+      "chibi-mint",
+      "chibi-violet",
+      "chibi-amber",
+    ]
+  ) {
+    const original = {
+      ...config(" Valid name "),
+      title: " Officer ",
+      department: " sales ",
+      prompt: " \tUse authorized facts.\n ",
+      avatar,
+    };
+    const saved = await one(
+      "select * from public.save_agent($1,null,null,$2,$3::jsonb)",
+      [A, "marketing", JSON.stringify(original)],
+    );
+    assert.equal(saved!.department, "sales");
+    assert.deepEqual(saved!.configuration, {
+      ...original,
+      name: "Valid name",
+      title: "Officer",
+      department: "sales",
+      prompt: "Use authorized facts.",
+    });
+  }
+});
+
+test("direct task RPCs reject invalid inputs and preserve the previous task on failure", async () => {
+  const t = await task();
+  const invalid = [null, [], { ["x".repeat(201)]: "long key" }, {
+    evidence: "x".repeat(65537),
+  }];
+  for (const inputs of invalid) {
+    await denied("select public.create_task($1,$2,$3,$4::jsonb)", [
+      A,
+      budget,
+      "Invalid inputs",
+      JSON.stringify(inputs),
+    ], /INVALID_INPUT/);
+    await denied("select public.update_task_inputs($1,$2,$3::jsonb)", [
+      A,
+      t.id,
+      JSON.stringify(inputs),
+    ], /INVALID_INPUT/);
+  }
+  for (const title of [null, " \t\n ", "x".repeat(241)]) {
+    await denied("select public.create_task($1,$2,$3,$4::jsonb)", [
+      A,
+      budget,
+      title,
+      "{}",
+    ], /INVALID_INPUT/);
+  }
+  const unchanged = await one(
+    "select inputs,status from public.tasks where id=$1",
+    [t.id],
+  );
+  assert.deepEqual(unchanged!.inputs, t.inputs);
+  assert.equal(unchanged!.status, "New");
+});
+
+test("direct RPC null parameters cannot bypass request validation or alter a review", async () => {
+  const t = await task();
+  await denied(
+    "select public.begin_ai_run($1,$2,null)",
+    [A, t.id],
+    /INVALID_INPUT/,
+  );
+  const run = await begin(t);
+  const draftId = await finish(run.run.id);
+  await who(2);
+  const d = await one("select content_hash from public.drafts where id=$1", [
+    draftId,
+  ]);
+  await db.query("select public.submit_review($1,$2)", [A, t.id]);
+  await who(1);
+  for (
+    const [decision, reason] of [[null, ""], ["approved", null], [
+      "rejected",
+      "\t\n",
+    ]]
+  ) {
+    await denied("select public.review_draft($1,$2,$3,$4,$5,$6)", [
+      A,
+      t.id,
+      draftId,
+      d!.content_hash,
+      decision,
+      reason,
+    ], /INVALID_INPUT/);
+  }
+  assert.equal(
+    (await one("select status from public.tasks where id=$1", [t.id]))!.status,
+    "Awaiting approval",
+  );
+  assert.equal((await db.query("select * from public.reviews")).rows.length, 0);
+  await who(0);
+  await denied("select public.set_membership($1,$2,$3,$4,null)", [
+    A,
+    users[2],
+    "member",
+    "sales",
+  ], /INVALID_INPUT/);
+  await denied("select public.set_membership($1,$2,null,$3,true)", [
+    A,
+    users[2],
+    "sales",
+  ], /INVALID_INPUT/);
+});

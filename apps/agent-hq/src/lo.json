@@ -507,5 +507,6 @@
   "Loading cloud workspace…": "ກຳລັງໂຫຼດພື້ນທີ່ Cloud…",
   "Loading office…": "ກຳລັງໂຫຼດຫ້ອງການ…",
   "Refresh": "ໂຫຼດໃໝ່",
-  "Retry expired execution": "ລອງວຽກທີ່ໝົດເວລາອີກຄັ້ງ"
+  "Retry expired execution": "ລອງວຽກທີ່ໝົດເວລາອີກຄັ້ງ",
+  "INVALID_INPUT": "ຂໍ້ມູນທີ່ປ້ອນບໍ່ຖືກຕ້ອງ ຫຼືເກີນຂະໜາດທີ່ອະນຸຍາດ"
 }

@@ -4,7 +4,7 @@ Validated on the feature branch in the managed local workspace. No remote Supaba
 
 | Check | Result | What it establishes |
 | --- | --- | --- |
-| `npm run test:phase2` | **26 passed, 0 failed** | 13 Edge/provider-contract tests, 12 actual local PostgreSQL tests, 1 public-environment guard test |
+| `npm run test:phase2` | **30 passed, 0 failed** | 13 Edge/provider-contract tests, 16 actual local PostgreSQL tests, 1 public-environment guard test |
 | `npm run check:edge` | Passed | Deno strict typecheck of Edge entry point and shared modules |
 | `npm run build` | Passed | React/TypeScript/Vite production build into ignored local `dist/` only |
 | `tests/smoke.py` | Passed, no page errors | Local office/WebGL, editable agents, required-input gates, local task/rejection/approval/export, chat and mobile layout |
@@ -21,3 +21,9 @@ Provider/Gateway HTTP fixtures exist only under tests. Runtime calls the real Op
 Existing regression suites were run against the local feature source on port 5175; the cloud UI suite used a separate local Vite process on port 5176 with public placeholder configuration. Browser state belongs to disposable test contexts. The shared form label fix was followed by another smoke/cloud run. Existing CEO/upload suites passed with the extracted shared builder; no persistence or upload implementation was changed afterward.
 
 Still unverified: actual hosted JWT signing/gateway settings, provider model/account availability, production concurrency/load, Auth email/invite/recovery/MFA setup and every Google OAuth/token/Drive operation. These require a separately approved disposable integration environment and credentials before any production approval. See [setup and approval gates](phase2.md) and [Google OAuth acceptance plan](google-drive-phase2.md).
+
+## Direct-RPC follow-up review
+
+Four additional regression tests failed on the earlier draft and passed after adding SQL-level validation. The prior Edge path already validated these inputs; authorized direct RPC callers could store partial/mistyped agent configuration or task inputs with unsupported keys, and some null arguments raised generic constraint errors. No cross-organization privilege escalation was demonstrated.
+
+The added tests exercise partial/unknown configuration fields, mistyped booleans/arrays, unsupported permissions/languages/portraits/colors, blank prompts/titles, excessive array/text/input sizes, all six valid portraits, normalization of required text, null run/review/membership values and unchanged task/review state after rejection. All 30 tests now pass against the amended drafts in local PostgreSQL. Frontend behavior is unchanged apart from Lao text for `INVALID_INPUT`; the browser results above remain the earlier regression baseline. Hosted service integration is still untested.
