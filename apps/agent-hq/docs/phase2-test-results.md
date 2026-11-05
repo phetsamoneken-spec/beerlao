@@ -61,3 +61,7 @@ The user explicitly approved the three-step Drive rollout. Migration 003 was ins
 ## Windows upload failure diagnosis
 
 The user-reported first real upload returned HTTP 400; the initial helper discarded the API error message, so its cause remains unconfirmed. A public OPTIONS check still returns 404. Pinned Supabase/Zod npm versions both exist (public registry HTTP 200), ruling out missing releases. The helper now matches conventional FormData wire fields (quoted names, plain metadata, no filename* duplicate, explicit empty static patterns), and reports only bounded structured API error messages with token/control-character redaction. Eight offline PowerShell guard/multipart/response/redaction checks pass. This is not a verified hosted-deployment fix. No automatic retry, SQL rerun, frontend change or Google operation occurred.
+
+## Confirmed hosted dependency-resolution failure
+
+The user supplied the second upload’s structured error: the hosted bundler could not resolve the pinned npm Supabase client because `nodeModulesDir` was manual. `npm run check:edge:clean` reproduces that exact failure using copied source/config, no package.json/node_modules and a fresh Deno cache. Changing the Edge config to auto resolves dependencies and typechecks both entry points successfully in that isolated condition. Added this meaningful check to review CI; ordinary checking in a populated npm checkout had hidden the deployment problem. Updated the Windows release source pin and deno.json checksum. No hosted retry or SQL/frontend change was performed by the agent.

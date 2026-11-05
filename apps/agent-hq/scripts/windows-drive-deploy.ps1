@@ -13,14 +13,14 @@ param(
 
 $script:DriveProject = 'vhywnalpkahkfqhiqdgd'
 $script:DriveApiBase = "https://api.supabase.com/v1/projects/$script:DriveProject"
-$script:DriveSourceCommit = '34d21382d89f61e1a5811329f6cad9db16f3a2ad'
+$script:DriveSourceCommit = '74766e9e8eb6af70dcc345032d9328244b9bc3a5'
 $script:DriveSourceBase = "https://raw.githubusercontent.com/phetsamoneken-spec/beerlao/$script:DriveSourceCommit/apps/agent-hq/supabase/functions"
 $script:DriveFiles = [ordered]@{
   'drive-api/index.ts' = 'cf2a02e0bedd1483d8979844e8711a6fbeb40e8cbca86d1bfc3cbc58f50a07c6'
   '_shared/drive.ts' = 'c50faad07e3957d0cd2b84bceb4844d1141991567b51f7200177ca6a8574d87a'
   '_shared/drive-contracts.ts' = '0d6a47864e1c79f6b021ee58458468fef4ead5fca16ccf0fab29a553444092f9'
   '_shared/contracts.ts' = 'ffd311c9326fa8d49c33ab76ac1eb03e50d2f9903a7738845c40bf19cc832705'
-  'deno.json' = 'a20f35987e5301e4636767caf5a262ae3abf940c30d1821b604587f2871c94e5'
+  'deno.json' = 'b94e2aae60442e9f7dff788c3cd422c37a9fd6ce0818cb4a05c5dfedf471b7ef'
 }
 
 function Invoke-DriveMetadata {
@@ -133,7 +133,7 @@ function Invoke-DriveWindowsSetup {
       throw 'drive-api already exists. This script refuses to overwrite it; review the existing function first.'
     }
     Write-Host "Target: $script:DriveProject; create drive-api only; Google callback uses verify_jwt=false."
-    Write-Host 'All app POST requests still verify Auth in the function. Install reviewed migration 003 separately first.'
+    Write-Host 'All app POST requests still verify Auth. Migration 003 is installed for this rollout; this script does not run SQL.'
     $confirmation = Read-Host "To approve this live function creation, type DEPLOY $script:DriveProject"
     if ($confirmation -cne "DEPLOY $script:DriveProject") { Write-Host 'Cancelled. Nothing was deployed.'; return }
     $sourceDirectory = Join-Path ([System.IO.Path]::GetTempPath()) ('agent-hq-drive-' + [Guid]::NewGuid().ToString('N'))

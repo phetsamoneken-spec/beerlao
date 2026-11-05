@@ -9,10 +9,11 @@
   },
   "windows_script": {
     "file": "scripts/windows-drive-deploy.ps1",
-    "sha256": "e51d31535790f60b4a2ccab1480f25e48f2f5bba8211a89c3ba223ac1eaf1f78",
+    "sha256": "d470e4d8df84b763ac348130cb1de7c94750d0b8dd5a3f7c89d30aed1ded340f",
     "default": "read_only",
     "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only",
-    "latest_attempt": "User-reported HTTP 400; public drive-api OPTIONS remains 404. Root cause unconfirmed. Updated multipart compatibility and bounded/redacted API diagnostics; no automatic retry."
+    "latest_attempt": "Confirmed remote HTTP 400: nodeModulesDir manual expected preinstalled npm modules. Reproduced in a clean directory; auto mode passes both entry points with a fresh cache. Updated source pin/checksum. Awaiting user-local retry; no SQL rerun or frontend change.",
+    "drive_source_commit": "74766e9e8eb6af70dcc345032d9328244b9bc3a5"
   },
   "frontend": {
     "flags": {

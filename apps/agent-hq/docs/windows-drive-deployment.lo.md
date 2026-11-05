@@ -8,7 +8,7 @@
 
 ## ສະຄຣິບທີ່ກຽມໄວ້
 
-ໄຟລ໌ `scripts/windows-drive-deploy.ps1` ໃຊ້ [Supabase Management API](https://supabase.com/docs/reference/api/v1-deploy-a-function). ມັນອັບໂຫຼດສະເພາະ source ຂອງ `drive-api` ຈາກ commit `34d21382d89f61e1a5811329f6cad9db16f3a2ad`, ກວດ SHA-256 ຂອງທຸກໄຟລ໌ ແລະຈຳກັດ token ໃຫ້ສົ່ງໄປ `api.supabase.com` ໂດຍບໍ່ຕາມ redirect.
+ໄຟລ໌ `scripts/windows-drive-deploy.ps1` ໃຊ້ [Supabase Management API](https://supabase.com/docs/reference/api/v1-deploy-a-function). ມັນອັບໂຫຼດສະເພາະ source ຂອງ `drive-api` ຈາກ commit `74766e9e8eb6af70dcc345032d9328244b9bc3a5`, ກວດ SHA-256 ຂອງທຸກໄຟລ໌ ແລະຈຳກັດ token ໃຫ້ສົ່ງໄປ `api.supabase.com` ໂດຍບໍ່ຕາມ redirect.
 
 ດາວໂຫຼດໄຟລ໌ຈາກ Draft PR ເຂົ້າໃນໂຟນເດີທີ່ຫາງ່າຍ ແລ້ວກວດ source/hash ກ່ອນລັນ. ຂ້ອຍຈະໃຫ້ຄຳສັ່ງດາວໂຫຼດແບບລັອກ commit ແລະ hash ໃນແຊັດເມື່ອຮຸ່ນກວດທານພ້ອມ.
 
@@ -41,3 +41,7 @@
 ## ການ upload ຄັ້ງທຳອິດຕອບ 400
 
 ຜູ້ໃຊ້ລັນສະຄຣິບ e511721 ແລ້ວ API ຕອບ HTTP 400. ຂໍ້ຄວາມສາເຫດບໍ່ຖືກສະແດງໃນຮຸ່ນນັ້ນ; ຍັງບໍ່ຮູ້ສາເຫດແນ່ນອນ. Endpoint ຍັງຕອບ 404 ແລະ frontend ຍັງບໍ່ປ່ຽນ. ຮຸ່ນໃໝ່ໃຊ້ multipart ແບບ FormData (quoted names, metadata text field, ບໍ່ມີ filename* ຊ້ຳ, static_patterns ວ່າງ) ແລະລາຍງານ `API reason:` ຈາກຊ່ອງ error ທີ່ເລືອກໄວ້ ພ້ອມປິດບັງ token, ຈຳກັດຄວາມຍາວ ແລະຕັດ control characters. ນີ້ເປັນການປັບຄວາມເຂົ້າກັນໄດ້/ການວິນິດໄສ; ຍັງບໍ່ໄດ້ຢືນຢັນວ່າແກ້ການ upload ຈິງແລ້ວ. ຢ່າລັນ SQL ຊ້ຳ.
+
+## ພົບສາເຫດ HTTP 400 ແລ້ວ
+
+ຜົນຈາກ API reason ຢືນຢັນວ່າ `nodeModulesDir: "manual"` ຕ້ອງການ npm packages ທີ່ຕິດຕັ້ງໄວ້, ແຕ່ຊຸດ upload ມີພຽງ source files. ການປັບ multipart ກ່ອນໜ້ານີ້ບໍ່ໄດ້ຢືນຢັນວ່າເປັນສາເຫດ. ຮຸ່ນໃໝ່ປ່ຽນ config ເປັນ `"auto"` ແລະລັອກ source commit/hash ໃໝ່. ຈຳລອງ error ເດີມໄດ້ໃນ clean directory; ຫຼັງແກ້ ກວດທັງສອງ entry points ຜ່ານໂດຍບໍ່ມີ node_modules/cache ເກົ່າ. ຍັງຕ້ອງໃຫ້ຜູ້ໃຊ້ລັນ deploy ຮຸ່ນນີ້ຈາກ Windows ແລະກວດ endpoint ຈິງ. ບໍ່ຕ້ອງປ່ຽນ token ຫຼືລັນ SQL ຊ້ຳ.
