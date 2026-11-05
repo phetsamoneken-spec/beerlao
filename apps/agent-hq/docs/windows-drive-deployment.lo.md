@@ -37,3 +37,7 @@
 5. ທ່ານເຂົ້າ Cloud workspace ດ້ວຍບັນຊີທີ່ຢືນຢັນອີເມວແລ້ວ, ສ້າງ/ເລືອກອົງກອນ ແລ້ວເຊື່ອມ Google Drive ແລະຢືນຢັນບັນຊີ Google ດ້ວຍຕົນເອງ.
 
 ສະຄຣິບນີ້ສ້າງສະເພາະ backend function. ມັນບໍ່ປ່ຽນ Secrets, ບໍ່ລັນ SQL, ບໍ່ເປີດ frontend ແລະບໍ່ອ່ານ/ຂຽນໄຟລ໌ Google. ການທົດສອບ PowerShell ທີ່ກຽມໄວ້ໃຊ້ offline fixtures ເທົ່ານັ້ນ; ຍັງບໍ່ໄດ້ທົດສອບ upload ຈິງ.
+
+## ການ upload ຄັ້ງທຳອິດຕອບ 400
+
+ຜູ້ໃຊ້ລັນສະຄຣິບ e511721 ແລ້ວ API ຕອບ HTTP 400. ຂໍ້ຄວາມສາເຫດບໍ່ຖືກສະແດງໃນຮຸ່ນນັ້ນ; ຍັງບໍ່ຮູ້ສາເຫດແນ່ນອນ. Endpoint ຍັງຕອບ 404 ແລະ frontend ຍັງບໍ່ປ່ຽນ. ຮຸ່ນໃໝ່ໃຊ້ multipart ແບບ FormData (quoted names, metadata text field, ບໍ່ມີ filename* ຊ້ຳ, static_patterns ວ່າງ) ແລະລາຍງານ `API reason:` ຈາກຊ່ອງ error ທີ່ເລືອກໄວ້ ພ້ອມປິດບັງ token, ຈຳກັດຄວາມຍາວ ແລະຕັດ control characters. ນີ້ເປັນການປັບຄວາມເຂົ້າກັນໄດ້/ການວິນິດໄສ; ຍັງບໍ່ໄດ້ຢືນຢັນວ່າແກ້ການ upload ຈິງແລ້ວ. ຢ່າລັນ SQL ຊ້ຳ.

@@ -1,6 +1,6 @@
 {
   "project": "vhywnalpkahkfqhiqdgd",
-  "status": "migration_installed_function_and_frontend_pending",
+  "status": "migration_installed_windows_upload_http400_function_frontend_pending",
   "migration": {
     "file": "supabase/migrations/202611050003_google_drive.sql",
     "sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249",
@@ -9,9 +9,10 @@
   },
   "windows_script": {
     "file": "scripts/windows-drive-deploy.ps1",
-    "sha256": "23d54642bee235ff8d468b57c25903691ae8e5b2a23156e9947b296f2acf2adc",
+    "sha256": "e51d31535790f60b4a2ccab1480f25e48f2f5bba8211a89c3ba223ac1eaf1f78",
     "default": "read_only",
-    "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only"
+    "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only",
+    "latest_attempt": "User-reported HTTP 400; public drive-api OPTIONS remains 404. Root cause unconfirmed. Updated multipart compatibility and bounded/redacted API diagnostics; no automatic retry."
   },
   "frontend": {
     "flags": {

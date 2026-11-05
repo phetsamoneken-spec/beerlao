@@ -66,6 +66,10 @@ try {
     $metadataPart = $parts | Where-Object { $_.Headers.ContentDisposition.Name.Trim('"') -eq 'metadata' }
     $metadata = $metadataPart.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
     Assert-Drive ($metadata.entrypoint_path -eq 'drive-api/index.ts' -and $metadata.import_map_path -eq 'deno.json' -and $metadata.verify_jwt -eq $false) 'Wrong deployment metadata.'
+    Assert-Drive ($metadata.static_patterns.Count -eq 0) 'Static patterns should be explicitly empty.'
+    Assert-Drive ($metadataPart.Headers.ContentType.MediaType -eq 'text/plain') 'Metadata must be a standard text field.'
+    $wire = $form.ReadAsStringAsync().GetAwaiter().GetResult()
+    Assert-Drive ($wire.Contains('name="metadata"') -and -not $wire.Contains('filename*=')) 'Multipart is not canonical FormData.'
     $filenames = @($parts | Where-Object { $_.Headers.ContentDisposition.Name.Trim('"') -eq 'file' } | ForEach-Object { $_.Headers.ContentDisposition.FileName.Trim('"') })
     foreach ($file in $script:DriveFiles.Keys) { Assert-Drive ($filenames -ccontains $file) 'Relative source filename was lost.' }
   } finally { $form.Dispose() }
@@ -76,4 +80,10 @@ Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';statu
 Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';status='ACTIVE';verify_jwt=$false})
 Expect-DriveFailure { Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';status='ACTIVE';verify_jwt=$true}) }
 Expect-DriveFailure { Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='other';status='ACTIVE'}) }
-Write-Host 'PASS: seven offline guard/multipart/response checks; no real credentials or network writes.'
+$fixtureToken = 'sbp_fixture_1234567890abcdef'
+$safeFailure = Format-DriveApiFailure -Body ('{"message":"Module not found: _shared/drive.ts. ' + $fixtureToken + '\u001b[31m","secret":"must-not-print-this"}') -Token $fixtureToken
+Assert-Drive ($safeFailure.Contains('Module not found') -and -not $safeFailure.Contains($fixtureToken) -and -not $safeFailure.Contains('must-not-print-this') -and -not $safeFailure.Contains([char]27)) 'API diagnostic leaked unsafe fields/token/control characters.'
+Assert-Drive ((Format-DriveApiFailure -Body '<html>untrusted</html>' -Token $fixtureToken) -eq 'No structured API error message was returned.') 'Non-JSON diagnostic was not suppressed.'
+$longFailure = Format-DriveApiFailure -Body (@{message=('x' * 3000)} | ConvertTo-Json) -Token $fixtureToken
+Assert-Drive ($longFailure.Length -le 1503) 'API diagnostic was not bounded.'
+Write-Host 'PASS: eight offline guard/multipart/response/redaction checks; no real credentials or network writes.'

@@ -48,9 +48,13 @@ function New-DriveUpload {
   param([string]$Directory)
   $form = [System.Net.Http.MultipartFormDataContent]::new()
   try {
-    $metadata = @{ name='drive-api'; entrypoint_path='drive-api/index.ts'; import_map_path='deno.json'; verify_jwt=$false } | ConvertTo-Json -Compress
-    $part = [System.Net.Http.StringContent]::new($metadata, [System.Text.Encoding]::UTF8, 'application/json')
-    $form.Add($part, 'metadata')
+    $metadata = @{ name='drive-api'; entrypoint_path='drive-api/index.ts'; import_map_path='deno.json'; static_patterns=@(); verify_jwt=$false } | ConvertTo-Json -Compress
+    # Match a standard FormData text field and ASCII File filenames, without
+    # a second RFC 5987 filename* containing percent-encoded path separators.
+    $part = [System.Net.Http.StringContent]::new($metadata, [System.Text.Encoding]::UTF8, 'text/plain')
+    $part.Headers.ContentDisposition = [System.Net.Http.Headers.ContentDispositionHeaderValue]::new('form-data')
+    $part.Headers.ContentDisposition.Name = '"metadata"'
+    $form.Add($part)
     foreach ($name in $script:DriveFiles.Keys) {
       $file = Join-Path $Directory $name
       $actual = (Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -58,10 +62,35 @@ function New-DriveUpload {
       $bytes = [System.IO.File]::ReadAllBytes($file)
       $filePart = [System.Net.Http.ByteArrayContent]::new($bytes)
       $filePart.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::new('application/octet-stream')
-      $form.Add($filePart, 'file', $name)
+      $filePart.Headers.ContentDisposition = [System.Net.Http.Headers.ContentDispositionHeaderValue]::new('form-data')
+      $filePart.Headers.ContentDisposition.Name = '"file"'
+      $filePart.Headers.ContentDisposition.FileName = '"' + $name + '"'
+      $form.Add($filePart)
     }
     return ,$form
   } catch { $form.Dispose(); throw }
+}
+
+function Format-DriveApiFailure {
+  param([string]$Body, [string]$Token)
+  $messages = [System.Collections.Generic.List[string]]::new()
+  try {
+    $parsed = $Body | ConvertFrom-Json -ErrorAction Stop
+    if ($parsed.message -is [string]) { $messages.Add($parsed.message) }
+    elseif ($parsed.message -is [array]) {
+      foreach ($item in @($parsed.message | Select-Object -First 5)) { if ($item -is [string]) { $messages.Add($item) } }
+    }
+    if ($parsed.error -is [string]) { $messages.Add($parsed.error) }
+    elseif ($parsed.error.message -is [string]) { $messages.Add($parsed.error.message) }
+  } catch { return 'No structured API error message was returned.' }
+  if (-not $messages.Count) { return 'No structured API error message was returned.' }
+  $safe = $messages -join ' | '
+  if ($Token) { $safe = $safe.Replace($Token, '[redacted]') }
+  $safe = [regex]::Replace($safe, '(sbp_|sb_secret_|sk-proj-)[A-Za-z0-9_-]{6,}', '[redacted]')
+  $safe = [regex]::Replace($safe, '(?i)Bearer\s+\S+|(GOCSPX-|ya29\.)[A-Za-z0-9._-]+', '[redacted]')
+  $safe = [regex]::Replace($safe, '[\x00-\x1f\x7f]', ' ')
+  if ($safe.Length -gt 1500) { $safe = $safe.Substring(0,1500) + '...' }
+  return $safe
 }
 
 function Assert-DriveDeploymentResponse {
@@ -120,8 +149,12 @@ function Invoke-DriveWindowsSetup {
     $response = $null
     try {
       $response = $client.SendAsync($message).GetAwaiter().GetResult()
-      if (-not $response.IsSuccessStatusCode) { throw "Function upload returned HTTP $([int]$response.StatusCode). Check Supabase Functions before retrying; no automatic retry is performed." }
-      $result = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
+      $responseText = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+      if (-not $response.IsSuccessStatusCode) {
+        $reason = Format-DriveApiFailure -Body $responseText -Token $plain
+        throw "Function upload returned HTTP $([int]$response.StatusCode). API reason: $reason. Check Supabase Functions before retrying; no automatic retry is performed."
+      }
+      $result = $responseText | ConvertFrom-Json
       Assert-DriveDeploymentResponse -Result $result
       Write-Host "drive-api : DEPLOYED (version $($result.version))"
     } finally {
