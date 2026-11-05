@@ -1,6 +1,6 @@
 # Phase 2 validation results
 
-Validated on the feature branch in the managed local workspace. Automated write/authorization tests use isolated fixtures. Read-only management/Auth checks were also performed against the user-designated Supabase project; live migrations, real end-user Auth, Google operations and paid inference were not executed. No deployment command was run. Published `agent-hq/` was unchanged.
+Validated on the feature branch in the managed local workspace. Automated write/authorization tests use isolated fixtures. Read-only management/Auth checks were also performed against the user-designated Supabase project; the explicitly approved schema installation completed on 2026-11-05, while real end-user Auth, Google operations and paid inference were not executed. No deployment command was run. Published `agent-hq/` was unchanged.
 
 | Check | Result | What it establishes |
 | --- | --- | --- |
@@ -34,4 +34,4 @@ The current integration changes passed 37 Node tests, strict Edge checking and a
 
 Real read-only checks: Auth health/settings returned 200; email authentication and signup are enabled. The management API accepted read-only schema metadata queries and reported zero public tables, no private schema and zero Auth users at preflight. PostgREST returned PGRST205 for organizations; agent-api preflight returned NOT_FOUND. No user or organization fixture was inserted remotely.
 
-Automatic approval review rejected the live migration before command execution, including a resubmission citing earlier user approval. No alternative write route was attempted. The complete guarded SQL is reproducible with `npm run prepare:schema` and was validated locally. Hosted installation and subsequent RLS verification remain pending an explicit approval accepted by that review.
+After the user explicitly approved the exact live Management API installation, the pinned guarded SQL package completed atomically on 2026-11-05. Hosted read-only metadata checks verified twelve RLS tables/policies, SELECT-only authenticated grants, no anonymous access, eleven secured public RPCs, server-only finalization, five immutable triggers and no authenticated access to private tokens. Real anonymous REST and organization-RPC requests both returned 401 / 42501, replacing the previous missing-schema response. Auth health remains 200; the AI Edge endpoint remains 404. A final count confirmed zero Auth users, organizations, tasks and audit events. No hosted accounts, fixtures, paid AI calls, frontend/Edge deployment or merge were performed. Full hosted multi-user workflows still need separate validation. See [installation evidence](verification/supabase-2026-11-05.json).

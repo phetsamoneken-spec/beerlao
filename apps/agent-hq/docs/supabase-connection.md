@@ -8,11 +8,11 @@ The supplied publishable key is configured only in ignored `.env.local`, with `V
 | --- | --- |
 | Public Auth health/settings | HTTP 200; email authentication and registration enabled |
 | Management read-only query | Authorized; metadata query ran with transaction read-only on |
-| Application schema | Zero public tables and no private schema at preflight |
+| Application schema | Installed: twelve public tables with RLS and SELECT policies, plus private schema |
 | Application users | Zero Auth users at preflight; none created by this task |
-| Organizations REST endpoint | 404 / PGRST205, schema not initialized |
+| Anonymous organizations REST / organization RPC | Both HTTP 401 / 42501 (permission denied); schema is recognized |
 | `agent-api` Edge Function | 404 / NOT_FOUND, not deployed |
-| Live migration attempt | Rejected before execution by automatic approval review |
+| Live installation | Approved and completed atomically on 2026-11-05; no user/business records inserted |
 
 ## What the web app now supports
 
@@ -31,10 +31,12 @@ npm run prepare:schema
 
 This creates `supabase/.local/phase2-schema-review.sql` plus its SHA-256/source manifest. It makes no network/database connection. It combines the two version-controlled migrations into one transaction, takes a transaction lock and refuses existing application tables or a private schema before any DDL. It inserts no users or business records. The original `docs/schema.sql` remains an older design and must not be run alongside these migrations.
 
-The user previously approved installation, but automatic approval review did not accept the earlier consent as unambiguous permission for this live management-API operation. The migration remains unexecuted. A fresh explicit approval of the exact target and persistent schema/RLS/RPC creation is required before retrying; do not bypass the rejection with another tool or route.
+The user explicitly approved this exact Management API installation after the earlier approval-review rejection. The pinned package completed on 2026-11-05 at 05:40:54 UTC in project `vhywnalpkahkfqhiqdgd`. Its SHA-256 is `ba8e2c9ae1a349b95bd70ca2c46ac0df80be962db9f9d610276eebf07de81857`. See the [credential-free installation and verification record](verification/supabase-2026-11-05.json). Do not rerun these create-table migrations on this project. They were installed as one Management API transaction, not with the Supabase CLI; CLI migration history must be explicitly reviewed and reconciled before any future `db push`.
 
 ## Remaining integration work
 
-After the approved schema is installed, verify all twelve RLS flags/policies, anonymous/direct-mutation denials and server-only finalization privileges. No schema overwrite or existing production-data change is authorized. Real account creation is performed by the user through the app, not by automated production test fixtures.
+Hosted metadata checks passed: all twelve tables have RLS and one SELECT policy; authenticated users have SELECT only, with no direct INSERT/UPDATE/DELETE/TRUNCATE grants; anonymous table/RPC access is denied. All eleven public RPCs use an empty search path and SECURITY DEFINER; AI finalization is executable by service_role, not authenticated/anon. Five immutable-record triggers exist. The private token table is inaccessible to authenticated users. Auth users, organizations, tasks and audit events remain empty.
+
+Real signup/sign-in and multi-user hosted isolation/mutation flows remain untested; those authorization flows passed in local PostgreSQL fixtures only. Account creation is performed by the user through the app. No schema overwrite or existing production-data change is authorized.
 
 Real AI still requires a separately approved `agent-api` deployment and server-side `AI_API_KEY`, `AI_MODEL`, Supabase runtime keys and exact `ALLOWED_ORIGINS`. A cloud proxy secret is not a raw secret to forward to hosted Edge Functions; configure hosted provider secrets through the reviewed Supabase secret-management surface. Google Drive remains design-only. Main, the published `agent-hq/` directory and the live GitHub Pages site remain unchanged until deployment/merge is explicitly approved.
