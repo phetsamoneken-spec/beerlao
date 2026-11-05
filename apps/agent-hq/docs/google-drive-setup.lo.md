@@ -55,6 +55,8 @@ Supabase runtime credentials ມາຈາກ Edge runtime; ຢ່າໃສ່ se
 
 ## 5. ສິດທີ່ Codex ຍັງຂາດ
 
+ຖ້າບໍ່ເຫັນ Codex Environment editor, ໃຫ້ໃຊ້ [ວິທີ PowerShell ໃນ Windows](windows-drive-deployment.lo.md). ວິທີນີ້ບໍ່ຕ້ອງສົ່ງ token ໃຫ້ Codex ຫຼື Publish environment.
+
 Management token ປັດຈຸບັນຕອບ 403 ສຳລັບ Functions ແລະ Secrets. ຖ້າໃຫ້ Codex deploy ໃຫ້, ສ້າງ token ຈຳກັດສະເພາະ project ນີ້ ແລະໃຫ້ Read/Write ສຳລັບ **Edge Functions** ແລະ **Edge Function Secrets**. ການກວດ Auth URLs ຕ້ອງມີສິດ **Auth configuration** ດ້ວຍ.
 
 ນຳ token ໃໝ່ໄປໃສ່ **Codex Environment → HTTP secrets → `SUPABASE_ACCESS_TOKEN`**, allowed domain `api.supabase.com`, ບັນທຶກ ແລະ Publish environment ຜ່ານ UI. ບໍ່ສົ່ງ token ໃນແຊັດ. ຖ້າຕັ້ງ Secrets ເອງໃນ Supabase UI ກໍບໍ່ຈຳເປັນໃຫ້ Codex ຮູ້ຄ່າ secret.
