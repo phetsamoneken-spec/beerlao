@@ -57,11 +57,13 @@ function fixture(
     refresh?: Record<string, unknown>;
     providerFailure?: boolean;
     finishDenied?: boolean;
+    changeDuringRead?: boolean;
   } = {},
 ) {
   const calls: { name: string; args: any }[] = [];
   const requests: { url: string; init?: RequestInit }[] = [];
   let attempt: any, claimed = false, ready: any, lease = false;
+  let metadataReads = 0;
   const gateway: DriveGateway = {
     async authenticate(value) {
       if (value !== "fixture-session") {
@@ -164,6 +166,7 @@ function fixture(
       return new Response(options.content || "Approved source facts.");
     }
     if (url.startsWith("https://www.googleapis.com/drive/v3/files/")) {
+      metadataReads++;
       return Response.json({
         id: "approved_file_123",
         name: "File",
@@ -171,7 +174,7 @@ function fixture(
         size: "22",
         trashed: false,
         modifiedTime: "2026-11-01T00:00:00Z",
-        version: "5",
+        version: options.changeDuringRead && metadataReads > 1 ? "6" : "5",
         capabilities: { canDownload: true },
         ...options.metadata,
       });
@@ -344,6 +347,7 @@ test("Oversized content, shortcuts, changed MIME and provider failures cannot be
       [{ content: "x".repeat(1024 * 1024 + 1) }, 413],
       [{ metadata: { mimeType: "application/vnd.google-apps.shortcut" } }, 422],
       [{ metadata: { mimeType: "text/csv" } }, 409],
+      [{ changeDuringRead: true }, 409],
       [{ providerFailure: true }, 502],
     ] as const
   ) {

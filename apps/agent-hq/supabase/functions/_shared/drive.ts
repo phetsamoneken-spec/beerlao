@@ -509,6 +509,14 @@ export function createDriveHandler(
         });
         if (!response.ok) throw new ApiError(502, "DRIVE_UNAVAILABLE");
         const bytes = await bounded(response, MAX_FILE);
+        const after = await googleFile(token, fileId);
+        if (
+          after.version !== file.version ||
+          after.modifiedTime !== file.modifiedTime ||
+          after.mimeType !== file.mimeType
+        ) {
+          throw new ApiError(409, "DRIVE_FILE_CHANGED");
+        }
         let text: string;
         try {
           text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
