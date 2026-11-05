@@ -40,3 +40,7 @@ Hosted metadata checks passed: all twelve tables have RLS and one SELECT policy;
 Real signup/sign-in and multi-user hosted isolation/mutation flows remain untested; those authorization flows passed in local PostgreSQL fixtures only. Account creation is performed by the user through the app. No schema overwrite or existing production-data change is authorized.
 
 Real AI still requires a separately approved `agent-api` deployment and server-side `AI_API_KEY`, `AI_MODEL`, Supabase runtime keys and exact `ALLOWED_ORIGINS`. A cloud proxy secret is not a raw secret to forward to hosted Edge Functions; configure hosted provider secrets through the reviewed Supabase secret-management surface. Google Drive remains design-only. Main, the published `agent-hq/` directory and the live GitHub Pages site remain unchanged until deployment/merge is explicitly approved.
+
+## Deployment follow-up
+
+The exact frontend production artifact is built and tested on `pages/agent-hq-phase2` without modifying main. The live Pages source switch was rejected before execution by automatic approval review, so the public site remains the prior version. Management access to functions, Edge secrets and Auth configuration is also denied (403, missing scopes). See [deployment review and required permissions](deployment-review.md) for the concrete publishing target, test evidence and next steps.

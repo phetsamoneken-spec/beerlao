@@ -1,6 +1,6 @@
 # AGENT HQ Phase 2 — implementation for review
 
-**Review branch. No deployment or local-data import has been performed. Live schema installation is still blocked by automatic approval review; only read-only project checks have executed.** Source is in `apps/agent-hq/`. Published `agent-hq/` stays unchanged. The cloud feature is disabled by default.
+**Review branch. The approved live schema/RLS/RPC installation completed on 2026-11-05. No local-data import or live frontend/Edge deployment has been performed.** Source is in `apps/agent-hq/`. A tested frontend publishing branch is prepared; the live Pages source remains main because automatic approval review requires explicit deployment approval. See [deployment review](deployment-review.md). The cloud feature is disabled in public templates and enabled only in the prepared publishing artifact.
 
 ## Existing code inspected
 
