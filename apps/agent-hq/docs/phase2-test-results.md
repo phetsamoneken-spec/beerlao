@@ -1,6 +1,6 @@
 # Phase 2 validation results
 
-Validated on the feature branch in the managed local workspace. Automated write/authorization tests use isolated fixtures. Read-only management/Auth checks were also performed against the user-designated Supabase project; the explicitly approved schema installation completed on 2026-11-05, while real end-user Auth, Google operations and paid inference were not executed. No deployment command was run. Published `agent-hq/` was unchanged.
+Validated on the feature branch in the managed local workspace. Automated write/authorization tests use isolated fixtures. Read-only management/Auth checks were also performed against the user-designated Supabase project; the explicitly approved schema installation completed on 2026-11-05, while real end-user Auth, Google operations and paid inference were not executed. The subsequently approved frontend deployment is live from a separate publishing branch, with a verified root-404 fix. No Edge deployment or merge occurred.
 
 | Check | Result | What it establishes |
 | --- | --- | --- |
@@ -39,3 +39,7 @@ After the user explicitly approved the exact live Management API installation, t
 ## Frontend deployment preparation
 
 Rebuilt the production artifact with the actual public project configuration. The Phase 2 suite and strict Edge checking passed again. Chromium smoke passed against the exact staged static files, and an additional no-submit UI check passed cloud registration/sign-in controls, Lao font, no page errors and no failed assets. No account was created and no Supabase requests were made by the browser checks. Secret scans passed. Only generated `agent-hq/` files differ from main on the publishing branch. The public deployment configuration change was subsequently explicitly approved. The actual GitHub API request returned 403 / Resource not accessible by integration; read-back confirmed source remains main. No live frontend verification is claimed. See [deployment review](deployment-review.md).
+
+## Live frontend publication and root-404 fix
+
+The owner selected the approved publishing branch; the initial frontend deployment succeeded. The app path returned 200 while the repository root returned 404 because only capitalized `Index.html` existed there. Publishing commit `b894b07` adds lowercase `index.html`, redirects to `./agent-hq/` and retains the original dashboard path. Pages run [41977817797](https://github.com/phetsamoneken-spec/beerlao/actions/runs/41977817797) passed. Live checks verified HTTP 200 and exact SHA-256 hashes for the root, legacy dashboard and all 23 application files. Chromium started at the public root and passed the redirect/cloud login/registration/Lao-font check with no page/static-asset errors or Supabase requests. No signup/login was submitted. See [published evidence](verification/published-2026-11-05.json). Historical blocked-deployment statements above describe earlier stages; frontend publication is now complete, while real hosted Auth workflows, AI deployment and Google operations remain unverified.

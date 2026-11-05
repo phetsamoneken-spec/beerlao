@@ -1,6 +1,6 @@
 # AGENT HQ Phase 2 — implementation for review
 
-**Review branch. The approved live schema/RLS/RPC installation completed on 2026-11-05. No local-data import or live frontend/Edge deployment has been performed.** Source is in `apps/agent-hq/`. A tested frontend publishing branch is prepared; the live Pages source remains main: explicit deployment approval was received, but the GitHub integration cannot write Pages settings (HTTP 403). See [deployment review](deployment-review.md). The cloud feature is disabled in public templates and enabled only in the prepared publishing artifact.
+**Review branch. The approved live schema/RLS/RPC installation and frontend publication completed on 2026-11-05.** Source is in `apps/agent-hq/`; the live frontend is published from `pages/agent-hq-phase2`, with a lowercase root redirect to AGENT HQ. Main and Draft PR remain unmerged. No local-data import or Edge deployment has been performed. See [deployment status](deployment-review.md). Cloud remains disabled in generic templates and is enabled in the published artifact.
 
 ## Existing code inspected
 
@@ -123,10 +123,10 @@ Google connections/sources are currently read-only foundations with no configura
 
 Generate the atomic, guarded review SQL without executing it using `npm run prepare:schema`; output and SHA-256 manifest are under ignored `supabase/.local/`. The package refuses existing app tables/private schema and never inserts sample/local records. See [current connection status](supabase-connection.md).
 
-Required future approvals are separate: merge; any further target-project SQL; Auth/provider/Google secret configuration; data migration/import; frontend/Edge deployment; and each external document write. A review approval alone must not execute these actions. Do not run `publish:files`, `supabase db push`, remote migrations or deploy commands, or merge this branch without the specific operation being authorized and permitted by automatic approval review.
+Required future approvals are separate: merge; any further target-project SQL; Auth/provider/Google secret configuration; data migration/import; further frontend releases/Edge deployment; and each external document write. A review approval alone must not execute these actions. Do not run `publish:files`, `supabase db push`, remote migrations or deploy commands, or merge this branch without the specific operation being authorized and permitted by automatic approval review.
 
 ## ສະຫຼຸບພາສາລາວ
 
 Phase 2 ເພີ່ມ Cloud workspace, Supabase Auth, ສິດ Admin/Manager/Member, RLS ແຍກອົງກອນ/ພະແນກ, AI backend ຈິງ ແລະການອະນຸມັດຮ່າງດ້ວຍ hash. ຮັກສາຫ້ອງ Chibi, ພາສາລາວ/ອັງກິດ, Noto Sans Lao ແລະຂໍ້ມູນໃນເຄື່ອງເດີມ. Cloud ປິດໄວ້ກ່ອນ ແລະບໍ່ນຳເຂົ້າຂໍ້ມູນອັດຕະໂນມັດ.
 
-ຍັງຕ້ອງຕັ້ງຄ່າ Supabase/AI ແລະທົດສອບກັບໂຄງການທົດລອງທີ່ອະນຸມັດ. Google Drive ມີພຽງແບບ OAuth ສຳລັບກວດທານ. ຂໍ້ມູນທຸລະກິດທີ່ປ້ອນຈະຖືກສົ່ງໃຫ້ຜູ້ໃຫ້ບໍລິການ AI ເມື່ອກົດດຳເນີນວຽກ; ຕ້ອງທົບທວນນະໂຍບາຍຂໍ້ມູນ ແລະຄົນຕ້ອງກວດຜົນ AI. ຕິດຕັ້ງ SQL schema ຈິງຕາມຄຳອະນຸມັດແລ້ວ ແລະກວດ RLS/ສິດຜ່ານ. ຍັງບໍ່ deploy, merge ຫຼືນຳເຂົ້າຂໍ້ມູນທຸລະກິດ. ຕ້ອງມີຄຳອະນຸມັດຊັດເຈນກ່ອນການປ່ຽນແປງເຫຼົ່ານັ້ນ.
+ຍັງຕ້ອງຕັ້ງຄ່າ Supabase/AI ແລະທົດສອບກັບໂຄງການທົດລອງທີ່ອະນຸມັດ. Google Drive ມີພຽງແບບ OAuth ສຳລັບກວດທານ. ຂໍ້ມູນທຸລະກິດທີ່ປ້ອນຈະຖືກສົ່ງໃຫ້ຜູ້ໃຫ້ບໍລິການ AI ເມື່ອກົດດຳເນີນວຽກ; ຕ້ອງທົບທວນນະໂຍບາຍຂໍ້ມູນ ແລະຄົນຕ້ອງກວດຜົນ AI. ຕິດຕັ້ງ SQL schema ຈິງຕາມຄຳອະນຸມັດແລ້ວ ແລະກວດ RLS/ສິດຜ່ານ. ເຜີຍແຜ່ frontend ແລ້ວ ແລະແກ້ໜ້າຫຼັກ 404 ແລ້ວ. ຍັງບໍ່ merge, deploy AI backend ຫຼືນຳເຂົ້າຂໍ້ມູນທຸລະກິດ. ຕ້ອງມີຄຳອະນຸມັດຊັດເຈນກ່ອນການປ່ຽນແປງເຫຼົ່ານັ້ນ.

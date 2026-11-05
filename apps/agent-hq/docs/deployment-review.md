@@ -1,16 +1,16 @@
 # Frontend deployment review — 2026-11-05
 
-The user explicitly approved switching GitHub Pages source to `pages/agent-hq-phase2`, path `/`, and deploying the prepared frontend. Automatic approval review accepted this fresh approval. The authorized GitHub API request then returned HTTP 403, `Resource not accessible by integration`: the current GitHub integration cannot write Pages settings. Read-back confirms the live source remains main. The user does not need to approve this operation again; repository-owner action or a GitHub integration with Pages write permission is required. No alternate credential or write route was attempted.
+The user explicitly approved switching GitHub Pages source to `pages/agent-hq-phase2`, path `/`, and deploying the prepared frontend. The integration could not change settings (HTTP 403), so the owner selected the prepared branch through GitHub settings. Read-back now confirms that branch is the live Pages source. The initial frontend deployment at `f697fca` completed successfully on 2026-11-05 at 05:59 UTC. Public AGENT HQ returned HTTP 200, and a Chromium no-submit check passed login/signup controls, Lao font and static assets with no page errors. No main merge or account creation was performed.
 
 ## Ready frontend
 
 - Public URL: https://phetsamoneken-spec.github.io/beerlao/agent-hq/
-- Current Pages source remains `main` at `/` (legacy branch deployment).
-- Prepared source: `pages/agent-hq-phase2` at `f697fca92f49ea75f6c6db10992e54b04c00c7b2`, root `/`.
+- Current Pages source is `pages/agent-hq-phase2` at `/` (legacy branch deployment).
+- Initial release: `f697fca92f49ea75f6c6db10992e54b04c00c7b2`; root-404 fix: `b894b07f00466bd0101548ac48a19ead4176431d`, on `pages/agent-hq-phase2`, root `/`.
 - Built from feature commit `2bd2ce65a0cc663a59df9812b295c4ce48c40900` with cloud enabled, the designated Supabase URL and publishable key. No service-role, management or provider key is included.
-- The deployment branch starts from main `019f3d4609f00ba2d58819102ebaa3f17d1a8f1b` and changes only generated `agent-hq/` files. All other existing pages/source remain byte-for-byte unchanged. Main and Draft PR #1 are unmerged.
+- The deployment branch starts from main `019f3d4609f00ba2d58819102ebaa3f17d1a8f1b` and changes generated `agent-hq/` files, plus adds a lowercase root `index.html` redirect. All preexisting files outside `agent-hq/`, including capitalized `Index.html`, remain byte-for-byte unchanged. Main and Draft PR #1 are unmerged.
 - Future GitHub Pages updates would follow this publishing branch, not main. Keep other root pages synchronized intentionally when publishing future releases.
-- Proposed live change: set repository Pages source to branch `pages/agent-hq-phase2`, path `/`, using the normal GitHub Pages API. This publishes the prepared app at the existing URL. The exact change is now explicitly approved, but GitHub integration permissions block it.
+- The owner completed the approved Pages source selection. Future pushes to the publishing branch now trigger Pages deployment normally.
 - To restore the prior site after an approved rollout if required, restore Pages source to `main`, path `/`; this does not undo the separate database schema installation.
 
 ## Validation
@@ -37,9 +37,15 @@ Auth Site URL/redirect allowlist and email confirmation/delivery need review for
 
 ## ຂັ້ນຕອນສຳລັບເຈົ້າຂອງ
 
-1. ອະນຸມັດ deploy ແລ້ວ. ເປີດ [GitHub Pages settings](https://github.com/phetsamoneken-spec/beerlao/settings/pages), ເລືອກ Source → Deploy from a branch, Branch → `pages/agent-hq-phase2`, folder → `/ (root)`, ແລ້ວກົດ Save. GitHub integration ປັດຈຸບັນບໍ່ມີສິດປ່ຽນ setting ນີ້ໃຫ້.
+1. GitHub Pages ຕັ້ງ branch ຖືກຕ້ອງແລ້ວ. ເປີດ https://phetsamoneken-spec.github.io/beerlao/agent-hq/ ເພື່ອໃຊ້ແອັບ.
 2. ເພີ່ມສິດ Read/Write ສຳລັບ Edge Functions, Edge Function Secrets ແລະ Auth configuration ໃຫ້ management token ທີ່ຈຳກັດ project ນີ້.
 3. ໃນ Environment → HTTP secrets → `SUPABASE_ACCESS_TOKEN`, ອັບເດດຄ່າ token; allowed domain ແມ່ນ `api.supabase.com`. ບັນທຶກ ແລະ Publish environment ຜ່ານໜ້າ UI.
 4. ໃນ Supabase → Edge Functions → Secrets, ຕັ້ງ `AI_API_KEY` ແລະ `AI_MODEL` ສຳລັບ provider ທີ່ຈະໃຊ້. ບໍ່ສົ່ງ key ຫຼື token ໃນແຊັດ.
 
-ຖານຂໍ້ມູນ 12 ຕາຕະລາງ ແລະ RLS/RPCs ຕິດຕັ້ງແລ້ວ. ເວັບຈິງຍັງເປັນລຸ້ນເດີມ ຈົນກວ່າຈະປ່ຽນ Pages source ໃນ GitHub settings. ບໍ່ຕ້ອງອະນຸມັດຊ້ຳອີກ.
+ຖານຂໍ້ມູນ 12 ຕາຕະລາງ ແລະ RLS/RPCs ຕິດຕັ້ງແລ້ວ. ເວັບ AGENT HQ ລຸ້ນໃໝ່ເຜີຍແຜ່ແລ້ວ. ຍັງລໍຖ້າສິດ Supabase ສຳລັບ AI backend ແລະການຕັ້ງຄ່າ Auth.
+
+## Root URL 404 fix
+
+The initial release served `/beerlao/agent-hq/` successfully, while `/beerlao/` returned 404 because the preexisting root entry was named `Index.html`. GitHub Pages paths are case-sensitive. A new lowercase `index.html`, versioned as `deployment/pages-index.html` in the application source, redirects the root to `./agent-hq/` and includes a plain link fallback. The old capitalized dashboard path is retained. The exact root redirect passed the local production Chromium check before publication.
+
+The root fix is now live: Pages run [41977817797](https://github.com/phetsamoneken-spec/beerlao/actions/runs/41977817797) succeeded. Both the root and legacy dashboard return 200, all 25 checked public files match the expected hashes, and live Chromium passed the root-to-cloud-UI flow with no errors. See [publication evidence](verification/published-2026-11-05.json).

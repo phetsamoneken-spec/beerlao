@@ -2,7 +2,7 @@
   "prepared_branch": "pages/agent-hq-phase2",
   "prepared_commit": "f697fca92f49ea75f6c6db10992e54b04c00c7b2",
   "current_live_source": {
-    "branch": "main",
+    "branch": "pages/agent-hq-phase2",
     "path": "/"
   },
   "proposed_live_source": {
@@ -10,7 +10,7 @@
     "path": "/"
   },
   "public_app_url": "https://phetsamoneken-spec.github.io/beerlao/agent-hq/",
-  "deployment_status": "explicitly_approved_but_github_integration_denied_pages_write",
+  "deployment_status": "published_after_owner_selected_approved_branch",
   "build": {
     "source_commit": "2bd2ce65a0cc663a59df9812b295c4ce48c40900",
     "cloud_enabled": true,
@@ -63,5 +63,7 @@
       "branch": "main",
       "path": "/"
     }
-  }
+  },
+  "current_live_commit": "b894b07f00466bd0101548ac48a19ead4176431d",
+  "live_verification_record": "published-2026-11-05.json"
 }
