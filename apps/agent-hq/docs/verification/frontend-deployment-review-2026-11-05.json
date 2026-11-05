@@ -10,7 +10,7 @@
     "path": "/"
   },
   "public_app_url": "https://phetsamoneken-spec.github.io/beerlao/agent-hq/",
-  "deployment_status": "blocked_before_execution_by_automatic_approval_review",
+  "deployment_status": "explicitly_approved_but_github_integration_denied_pages_write",
   "build": {
     "source_commit": "2bd2ce65a0cc663a59df9812b295c4ce48c40900",
     "cloud_enabled": true,
@@ -54,5 +54,14 @@
     "edge_functions_read",
     "edge_functions_secrets_read",
     "auth_config_read"
-  ]
+  ],
+  "github_api_result": {
+    "status": 403,
+    "message": "Resource not accessible by integration",
+    "operation": "PUT /repos/phetsamoneken-spec/beerlao/pages",
+    "post_attempt_source": {
+      "branch": "main",
+      "path": "/"
+    }
+  }
 }

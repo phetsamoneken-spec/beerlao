@@ -1,6 +1,6 @@
 # Frontend deployment review — 2026-11-05
 
-The user requested continuing with frontend/AI backend deployment. The production artifact is prepared and tested; the actual Pages configuration change was rejected before execution by automatic approval review because the original instructions prohibited deployment and the subsequent “continue” was not accepted as sufficiently explicit deployment consent. No alternate publication route or retry was attempted. A new explicit approval of the exact Pages source switch/public deployment is required.
+The user explicitly approved switching GitHub Pages source to `pages/agent-hq-phase2`, path `/`, and deploying the prepared frontend. Automatic approval review accepted this fresh approval. The authorized GitHub API request then returned HTTP 403, `Resource not accessible by integration`: the current GitHub integration cannot write Pages settings. Read-back confirms the live source remains main. The user does not need to approve this operation again; repository-owner action or a GitHub integration with Pages write permission is required. No alternate credential or write route was attempted.
 
 ## Ready frontend
 
@@ -10,7 +10,7 @@ The user requested continuing with frontend/AI backend deployment. The productio
 - Built from feature commit `2bd2ce65a0cc663a59df9812b295c4ce48c40900` with cloud enabled, the designated Supabase URL and publishable key. No service-role, management or provider key is included.
 - The deployment branch starts from main `019f3d4609f00ba2d58819102ebaa3f17d1a8f1b` and changes only generated `agent-hq/` files. All other existing pages/source remain byte-for-byte unchanged. Main and Draft PR #1 are unmerged.
 - Future GitHub Pages updates would follow this publishing branch, not main. Keep other root pages synchronized intentionally when publishing future releases.
-- Proposed live change: set repository Pages source to branch `pages/agent-hq-phase2`, path `/`, using the normal GitHub Pages API. This publishes the prepared app at the existing URL. Do not perform this change until explicit approval is accepted.
+- Proposed live change: set repository Pages source to branch `pages/agent-hq-phase2`, path `/`, using the normal GitHub Pages API. This publishes the prepared app at the existing URL. The exact change is now explicitly approved, but GitHub integration permissions block it.
 - To restore the prior site after an approved rollout if required, restore Pages source to `main`, path `/`; this does not undo the separate database schema installation.
 
 ## Validation
@@ -37,9 +37,9 @@ Auth Site URL/redirect allowlist and email confirmation/delivery need review for
 
 ## ຂັ້ນຕອນສຳລັບເຈົ້າຂອງ
 
-1. ອະນຸມັດ deploy ເວັບໂດຍປ່ຽນ GitHub Pages source ເປັນ `pages/agent-hq-phase2`, path `/`.
+1. ອະນຸມັດ deploy ແລ້ວ. ເປີດ [GitHub Pages settings](https://github.com/phetsamoneken-spec/beerlao/settings/pages), ເລືອກ Source → Deploy from a branch, Branch → `pages/agent-hq-phase2`, folder → `/ (root)`, ແລ້ວກົດ Save. GitHub integration ປັດຈຸບັນບໍ່ມີສິດປ່ຽນ setting ນີ້ໃຫ້.
 2. ເພີ່ມສິດ Read/Write ສຳລັບ Edge Functions, Edge Function Secrets ແລະ Auth configuration ໃຫ້ management token ທີ່ຈຳກັດ project ນີ້.
 3. ໃນ Environment → HTTP secrets → `SUPABASE_ACCESS_TOKEN`, ອັບເດດຄ່າ token; allowed domain ແມ່ນ `api.supabase.com`. ບັນທຶກ ແລະ Publish environment ຜ່ານໜ້າ UI.
 4. ໃນ Supabase → Edge Functions → Secrets, ຕັ້ງ `AI_API_KEY` ແລະ `AI_MODEL` ສຳລັບ provider ທີ່ຈະໃຊ້. ບໍ່ສົ່ງ key ຫຼື token ໃນແຊັດ.
 
-ຖານຂໍ້ມູນ 12 ຕາຕະລາງ ແລະ RLS/RPCs ຕິດຕັ້ງແລ້ວ. ເວັບຈິງຍັງເປັນລຸ້ນເດີມ ຈົນກວ່າ deploy ຈະຖືກອະນຸມັດ.
+ຖານຂໍ້ມູນ 12 ຕາຕະລາງ ແລະ RLS/RPCs ຕິດຕັ້ງແລ້ວ. ເວັບຈິງຍັງເປັນລຸ້ນເດີມ ຈົນກວ່າຈະປ່ຽນ Pages source ໃນ GitHub settings. ບໍ່ຕ້ອງອະນຸມັດຊ້ຳອີກ.

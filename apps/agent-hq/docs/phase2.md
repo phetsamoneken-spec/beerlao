@@ -1,6 +1,6 @@
 # AGENT HQ Phase 2 — implementation for review
 
-**Review branch. The approved live schema/RLS/RPC installation completed on 2026-11-05. No local-data import or live frontend/Edge deployment has been performed.** Source is in `apps/agent-hq/`. A tested frontend publishing branch is prepared; the live Pages source remains main because automatic approval review requires explicit deployment approval. See [deployment review](deployment-review.md). The cloud feature is disabled in public templates and enabled only in the prepared publishing artifact.
+**Review branch. The approved live schema/RLS/RPC installation completed on 2026-11-05. No local-data import or live frontend/Edge deployment has been performed.** Source is in `apps/agent-hq/`. A tested frontend publishing branch is prepared; the live Pages source remains main: explicit deployment approval was received, but the GitHub integration cannot write Pages settings (HTTP 403). See [deployment review](deployment-review.md). The cloud feature is disabled in public templates and enabled only in the prepared publishing artifact.
 
 ## Existing code inspected
 
