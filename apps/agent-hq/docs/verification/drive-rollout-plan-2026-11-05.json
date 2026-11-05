@@ -1,13 +1,15 @@
 {
   "project": "vhywnalpkahkfqhiqdgd",
-  "status": "prepared_not_applied",
+  "status": "migration_installed_function_and_frontend_pending",
   "migration": {
     "file": "supabase/migrations/202611050003_google_drive.sql",
-    "sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249"
+    "sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249",
+    "applied_at_utc": "2026-11-05T15:29:39.950228+00:00",
+    "evidence": "drive-migration-2026-11-05.json"
   },
   "windows_script": {
     "file": "scripts/windows-drive-deploy.ps1",
-    "sha256": "9fdd32cc4b44675766601ac75fb15e2479ebdb61c956a4495605fd4d74b3042b",
+    "sha256": "23d54642bee235ff8d468b57c25903691ae8e5b2a23156e9947b296f2acf2adc",
     "default": "read_only",
     "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only"
   },
@@ -43,5 +45,6 @@
       "assets/CloudWorkspace-Crao1yvE.js": "ee739d0a125f37b918598fbf02c6e596bd5c7bb91f7bc8693fd5d793d42987e7"
     }
   },
-  "scope": "New Drive migration; user-local function deploy; publish frontend after backend checks. No main merge or Google file operations."
+  "scope": "New Drive migration; user-local function deploy; publish frontend after backend checks. No main merge or Google file operations.",
+  "approval": "Explicit user approval appovl following exact three-step rollout request"
 }

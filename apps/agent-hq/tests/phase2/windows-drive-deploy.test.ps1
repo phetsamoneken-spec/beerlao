@@ -72,4 +72,8 @@ try {
   Set-Content -LiteralPath (Join-Path $directory 'drive-api/index.ts') -Value 'tampered fixture' -Encoding utf8
   Expect-DriveFailure { $unexpected = New-DriveUpload -Directory $directory; $unexpected.Dispose() }
 } finally { if (Test-Path $directory) { Remove-Item -LiteralPath $directory -Recurse -Force } }
-Write-Host 'PASS: six offline guard/multipart checks; no real credentials or network writes.'
+Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';status='ACTIVE'})
+Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';status='ACTIVE';verify_jwt=$false})
+Expect-DriveFailure { Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='drive-api';status='ACTIVE';verify_jwt=$true}) }
+Expect-DriveFailure { Assert-DriveDeploymentResponse -Result ([pscustomobject]@{slug='other';status='ACTIVE'}) }
+Write-Host 'PASS: seven offline guard/multipart/response checks; no real credentials or network writes.'

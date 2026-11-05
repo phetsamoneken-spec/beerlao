@@ -64,6 +64,19 @@ function New-DriveUpload {
   } catch { $form.Dispose(); throw }
 }
 
+function Assert-DriveDeploymentResponse {
+  param($Result)
+  if ($Result.slug -ne 'drive-api' -or $Result.status -ne 'ACTIVE') {
+    throw 'Deployment response requires review. Inspect Supabase Functions; do not redeploy blindly.'
+  }
+  # verify_jwt is optional in the documented response. Live CORS/auth probes
+  # below verify behavior even when the API omits that field.
+  $jwt = $Result.PSObject.Properties['verify_jwt']
+  if ($jwt -and $jwt.Value -ne $false) {
+    throw 'Deployment JWT configuration requires review. Do not enable the frontend.'
+  }
+}
+
 function Invoke-DriveWindowsSetup {
   param([switch]$PublishFunction, [System.Security.SecureString]$Token)
   $ErrorActionPreference = 'Stop'
@@ -109,7 +122,7 @@ function Invoke-DriveWindowsSetup {
       $response = $client.SendAsync($message).GetAwaiter().GetResult()
       if (-not $response.IsSuccessStatusCode) { throw "Function upload returned HTTP $([int]$response.StatusCode). Check Supabase Functions before retrying; no automatic retry is performed." }
       $result = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult() | ConvertFrom-Json
-      if ($result.slug -ne 'drive-api' -or $result.status -ne 'ACTIVE' -or $result.verify_jwt -ne $false) { throw 'Deployment response requires review. Inspect Supabase Functions; do not redeploy blindly.' }
+      Assert-DriveDeploymentResponse -Result $result
       Write-Host "drive-api : DEPLOYED (version $($result.version))"
     } finally {
       if ($response) { $response.Dispose() }

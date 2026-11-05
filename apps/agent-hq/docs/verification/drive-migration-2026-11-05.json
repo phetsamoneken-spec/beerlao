@@ -1,0 +1,167 @@
+{
+  "installation": {
+    "project": "vhywnalpkahkfqhiqdgd",
+    "migration": "202611050003_google_drive.sql",
+    "source_sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249",
+    "execution_sha256": "d623c783f3418231529a0d5e40b499659ccc8498f86ec84d1479200ff0f973f2",
+    "completed_at_utc": "2026-11-05T15:29:39.950228+00:00",
+    "result": [],
+    "scope": "Approved additive Drive OAuth/read schema only. No 001/002 rerun, no tokens/accounts/test data inserted, no function/frontend deployment."
+  },
+  "hosted_metadata": {
+    "public_table_count": 12,
+    "all_public_rls": true,
+    "metadata_column_count": 2,
+    "lease_column_count": 2,
+    "token_fk_count": 1,
+    "anon_attempt_access": false,
+    "authenticated_attempt_access": false,
+    "authenticated_token_access": false,
+    "functions": [
+      {
+        "function": "drive_activate",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_add_source",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_begin",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_claim_callback",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_claim_refresh",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_complete_callback",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_connection_context",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_disconnect",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_finish_read",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_read_context",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_release_refresh",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_status",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      },
+      {
+        "function": "drive_store_refresh",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "anon_execute": false,
+        "service_execute": true,
+        "security_definer": true,
+        "authenticated_execute": false
+      }
+    ],
+    "attempt_count": 0,
+    "token_count": 0,
+    "connection_count": 0,
+    "data_source_count": 0
+  },
+  "next_steps": "User-local drive-api deployment, then public endpoint verification and already-approved frontend publication. No fresh approval needed for these exact steps.",
+  "public_api": {
+    "anonymous_drive_rpc": {
+      "status": 401,
+      "code": "42501"
+    },
+    "function_options": {
+      "status": 404
+    }
+  }
+}

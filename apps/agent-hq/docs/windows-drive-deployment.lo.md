@@ -22,6 +22,8 @@
 
 ## ລຳດັບເປີດໃຊ້ຈິງ
 
+**ອະນຸມັດ rollout ແລະຕິດຕັ້ງ migration 003 ແລ້ວ. ຢ່າລັນ SQL ຊ້ຳ.** ຂັ້ນຕໍ່ໄປແມ່ນ deploy backend ໃນ Windows ຕາມຂໍ້ 2; ຫຼັງ endpoint ຜ່ານ ຈຶ່ງເຜີຍແຜ່ frontend ຕາມຄຳອະນຸມັດເດີມ.
+
 1. ກວດ ແລະອະນຸມັດ migration `202611050003_google_drive.sql` ສຳລັບ project `vhywnalpkahkfqhiqdgd`. Codex ສາມາດໃຊ້ສິດ Database ທີ່ມີເພື່ອຕິດຕັ້ງ ແລະກວດໃຫ້ໄດ້ຫຼັງອະນຸມັດ. ບໍ່ລັນ 001/002 ຊ້ຳ.
 2. ຫຼັງ migration ສຳເລັດ ແລະອະນຸມັດ deploy backend ແລ້ວ ຈຶ່ງລັນ:
 
