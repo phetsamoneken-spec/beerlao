@@ -1,0 +1,35 @@
+# Google Drive read integration — prepared for review
+
+This is source implementation, not a live connection. The user has no Google Cloud/OAuth client yet and requested code plus setup instructions. Existing website/data remain untouched. [Lao setup guide](google-drive-setup.lo.md).
+
+## Implemented boundary
+
+`drive-api` implements start/status/confirm, explicit file approval, bounded read and disconnect. Its only unauthenticated route is GET `/drive-api/callback`, protected by a random hashed single-use state, expiry, PKCE S256 and membership recheck. Every POST verifies a confirmed Supabase user with `getUser` and a validated session ID with `getClaims`. Backend-only service RPCs independently check organization, active role and department using that verified identity. Browser roles cannot execute any Drive RPC or select vault/attempt records.
+
+OAuth uses fixed Google endpoints and an exact server redirect URI. Client secrets, PKCE verifiers and Google tokens never enter frontend code/storage. Callback processing uses Google userinfo over TLS to verify the consenting account; no unverified ID-token claims are trusted. After exchange, encrypted tokens remain pending until the original Supabase user/session explicitly confirms the displayed Google email. Replayed, expired and cross-session/organization handoffs are denied. Callback HTML contains no supplied code/token/account content and uses no-store, no-referrer and a restrictive CSP.
+
+The MVP deliberately requests `drive.readonly`, `openid`, and email after an explicit scope-consent checkbox. The earlier design preferred `drive.file`; selecting arbitrary existing files through Google Picker would expose a Google access token to the browser, which this application's restrictions prohibit. Readonly is broader at Google; the server restricts actual reads to explicitly approved file IDs assigned to an active same-department agent with Read data permission. Do not silently substitute a different scope. Restricted-scope verification/testing requirements are documented in the setup guide.
+
+AES-256-GCM uses a fresh 96-bit nonce and associated data binding organization, attempt/connection ID and purpose. The pending ID becomes the connection ID so activation moves ciphertext without weakening that binding. A versioned envelope is stored as bytes in `private.google_tokens`; plaintext exists only transiently in the Edge runtime. This first implementation supports key version 1 only. Overlapping-key rotation/re-encryption is not implemented; do not replace an active master key casually.
+
+Refreshes use a database lease; stale or revoked connections cannot save replacement tokens. Omitted Google refresh tokens are preserved. Broadened returned scopes are rejected. Invalid refreshes fail closed and request reconnection; they never fall back to cached success. No source content is stored in audit logs. Read receipts contain source ID, checksum and byte count; the response adds Google version/modified time, read time and parser version. Membership, connection and agent permissions are checked again before returning downloaded content.
+
+Only Google Docs (exported as text), UTF-8 text and CSV up to 1 MiB are accepted. Arbitrary URLs, home/folder links, shortcuts, binaries and unsupported Google app types are rejected. Fixed Google file endpoints are constructed from validated IDs with redirects disabled. Text is rendered escaped, never executed, and never automatically sent to AI. Human approval is for the exact file reference, not automatic trust in changing file contents. No ranges/Sheets parser, folder traversal, document write, overwrite, delete or sharing endpoint exists. Individual-source revocation is not yet provided; revoke access by disconnecting the connection or removing/disabling the agent's Read data permission.
+
+Disconnect locks/revokes the connection and deletes its stored token before best-effort Google revocation. It is available even after read-rate exhaustion or loss of the token row. A failed provider revoke never restores local access; the UI links to Google's permission management. Google's grant revocation can affect other connections to the same Google account/client; check this behavior in sandbox.
+
+## Migration and rollout
+
+`202611050003_google_drive.sql` is an additive draft on top of the installed 001/002 schema. It adds a private attempt table, token FK/refresh lease fields, source display metadata and thirteen service-only RPCs. Existing organization RLS and browser grants remain authoritative. Do not rerun 001/002 or the combined initial schema package. The new draft has been applied only to isolated PGlite, not the live project. User approval of the original twelve-table installation does not authorize this new migration automatically.
+
+`verify_jwt=false` is required only for `drive-api` so Google can reach the callback; all POST paths enforce Auth internally. `agent-api` configuration is unchanged. Browser feature flag `VITE_GOOGLE_DRIVE_ENABLED` defaults false. Do not enable it until the new migration, OAuth credentials, callback, runtime secrets and real sandbox tests are reviewed and deployed. Management API Functions/Secrets reads still return 403 (missing scopes), so no backend deployment/configuration has been attempted.
+
+Expired attempts fail closed after ten minutes. Ciphertext/verifiers of expired attempts are cleared on the next connect initiation; inactive projects do not yet have a scheduled sweep. Before general rollout, configure and review a maintenance job/retention policy for prompt erasure and deletion of old attempts and request-limit records. Callback URLs/authorization headers must be redacted by the deployment's gateway/log-retention configuration as well as application logs; application code does not log them.
+
+## Validation and remaining limits
+
+Nineteen new Node tests cover encryption/AAD/tampering, OAuth PKCE/state/replay/denial, original-session activation, private vault/RPC denial, tenant/department/role boundaries, revoked membership, source/agent permissions, refresh leases/scope retention, response-size/type limits, read-finalization authorization, rate limiting and disconnect. These join the existing 37 tests. Provider calls are HTTP fixtures; database tests run real isolated PGlite with test Auth roles. No production mocks are implemented.
+
+The intercepted Chromium suite covers Admin/Manager/Member UI, unavailable backend errors, explicit scope/file consent, account confirmation, escaped hostile text, Lao/mobile layout, disconnect and unchanged local data. Existing cloud and office smoke regressions also pass.
+
+Still required: actual Google project/consent screen/client and hosted secrets; scoped management access; explicit migration/deployment review; hosted callback routing/JWT behavior; full Google sandbox consent/refresh/disconnect and multi-user isolation; testing account policies, restricted-scope verification, retention jobs and master-key rotation operations. Real Google access, account creation and external document writes have not occurred.

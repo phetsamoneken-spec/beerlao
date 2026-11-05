@@ -39,7 +39,7 @@ Hosted metadata checks passed: all twelve tables have RLS and one SELECT policy;
 
 Real signup/sign-in and multi-user hosted isolation/mutation flows remain untested; those authorization flows passed in local PostgreSQL fixtures only. Account creation is performed by the user through the app. No schema overwrite or existing production-data change is authorized.
 
-Real AI still requires a separately approved `agent-api` deployment and server-side `AI_API_KEY`, `AI_MODEL`, Supabase runtime keys and exact `ALLOWED_ORIGINS`. A cloud proxy secret is not a raw secret to forward to hosted Edge Functions; configure hosted provider secrets through the reviewed Supabase secret-management surface. Google Drive remains design-only. The explicitly approved frontend is now live on GitHub Pages from the publishing branch. Main and Draft PR remain unmerged; Edge deployment remains blocked by missing management scopes.
+Real AI still requires a separately approved `agent-api` deployment and server-side `AI_API_KEY`, `AI_MODEL`, Supabase runtime keys and exact `ALLOWED_ORIGINS`. A cloud proxy secret is not a raw secret to forward to hosted Edge Functions; configure hosted provider secrets through the reviewed Supabase secret-management surface. Google Drive now has prepared read-only OAuth/read/disconnect code with a new unexecuted migration and disabled feature flag; no real Google connection or deployment has occurred. See [Lao Google setup](google-drive-setup.lo.md). The explicitly approved frontend is now live on GitHub Pages from the publishing branch. Main and Draft PR remain unmerged; Edge deployment remains blocked by missing management scopes.
 
 ## Deployment follow-up
 

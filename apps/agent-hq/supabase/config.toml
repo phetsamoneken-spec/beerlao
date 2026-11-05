@@ -2,3 +2,8 @@
 project_id = "agent-hq-phase2-local"
 [functions.agent-api]
 verify_jwt = true
+
+# Google redirects cannot supply a Supabase JWT. All non-callback requests
+# verify the bearer token with Auth getUser/getClaims inside drive-api.
+[functions.drive-api]
+verify_jwt = false

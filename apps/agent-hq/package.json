@@ -10,7 +10,7 @@
     "build:standalone": "tsc -b && node scripts/build-standalone.mjs",
     "publish:files": "npm run build && node scripts/sync-pages.mjs",
     "test:phase2": "node --experimental-strip-types --test tests/phase2/*.test.ts",
-    "check:edge": "deno check --config supabase/functions/deno.json supabase/functions/agent-api/index.ts",
+    "check:edge": "deno check --config supabase/functions/deno.json supabase/functions/agent-api/index.ts supabase/functions/drive-api/index.ts",
     "prepare:schema": "node scripts/prepare-schema.mjs"
   },
   "dependencies": {

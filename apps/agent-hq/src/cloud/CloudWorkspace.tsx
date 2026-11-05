@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cloud } from "./client";
 import { cloudRequest } from "./requests";
+import DrivePanel from "./DrivePanel";
 import { useI18n } from "../i18n";
 import { Builder, Field, Modal } from "../components/AgentBuilder";
 import { type Agent, emptyAgent, type Status } from "../model";
@@ -433,6 +434,7 @@ export default function CloudWorkspace() {
                     "AI employees",
                     "Task center",
                     "CEO Command Center",
+                    "Google Drive",
                     ...(admin ? ["Manage access"] : []),
                   ].map((name) => (
                     <button
@@ -444,6 +446,7 @@ export default function CloudWorkspace() {
                     </button>
                   ))}
                 </div>
+                {tab === "Google Drive" && <DrivePanel key={session.user.id + ":" + org} client={client} organizationId={org} department={membership?.department || ""} admin={admin} manager={manager} agents={agents} />}
                 {tab === "Company office" && (
                   <div className="cloud-office">
                     <Suspense fallback={<p>{t("Loading office…")}</p>}>

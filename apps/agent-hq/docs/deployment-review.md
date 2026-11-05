@@ -33,7 +33,7 @@ For the next backend step, provide project-scoped Read/Write access for Edge Fun
 
 Before deployment, verify hosted `AI_API_KEY` and `AI_MODEL`, exact `ALLOWED_ORIGINS=https://phetsamoneken-spec.github.io`, built-in Supabase runtime credentials and current JWT gateway/signing-key compatibility. Provider secret values must be configured directly in hosted Supabase Edge Function secrets, not forwarded from proxy-bound credential placeholders. No paid inference has been run.
 
-Auth Site URL/redirect allowlist and email confirmation/delivery need review for the public app URL. Current permissions prevent reading or changing them. Real account and multi-user hosted workflow verification remains outstanding. Google Drive remains design-only.
+Auth Site URL/redirect allowlist and email confirmation/delivery need review for the public app URL. Current permissions prevent reading or changing them. Real account and multi-user hosted workflow verification remains outstanding. Google Drive read-only OAuth/read/disconnect source is now prepared for review and defaults disabled; its migration and backend have not been deployed. See [Drive implementation](google-drive-implementation.md).
 
 ## ຂັ້ນຕອນສຳລັບເຈົ້າຂອງ
 

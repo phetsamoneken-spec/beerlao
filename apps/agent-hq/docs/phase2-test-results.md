@@ -4,7 +4,7 @@ Validated on the feature branch in the managed local workspace. Automated write/
 
 | Check | Result | What it establishes |
 | --- | --- | --- |
-| `npm run test:phase2` | **37 passed, 0 failed** | 13 Edge/provider-contract tests, 16 actual local PostgreSQL tests, 1 public-environment guard test, 6 browser transport-contract tests and 1 local schema-package test |
+| `npm run test:phase2` | **56 test definitions passed, 0 failures** | 13 AI Edge/provider tests, 16 core PostgreSQL tests, 1 environment guard, 6 transport tests, 1 schema-package test, 10 Drive API/crypto tests and 9 Drive PostgreSQL tests across seven files |
 | `npm run check:edge` | Passed | Deno strict typecheck of Edge entry point and shared modules |
 | `npm run build` | Passed | React/TypeScript/Vite production build into ignored local `dist/` only |
 | `tests/smoke.py` | Passed, no page errors | Local office/WebGL, editable agents, required-input gates, local task/rejection/approval/export, chat and mobile layout |
@@ -43,3 +43,9 @@ Rebuilt the production artifact with the actual public project configuration. Th
 ## Live frontend publication and root-404 fix
 
 The owner selected the approved publishing branch; the initial frontend deployment succeeded. The app path returned 200 while the repository root returned 404 because only capitalized `Index.html` existed there. Publishing commit `b894b07` adds lowercase `index.html`, redirects to `./agent-hq/` and retains the original dashboard path. Pages run [41977817797](https://github.com/phetsamoneken-spec/beerlao/actions/runs/41977817797) passed. Live checks verified HTTP 200 and exact SHA-256 hashes for the root, legacy dashboard and all 23 application files. Chromium started at the public root and passed the redirect/cloud login/registration/Lao-font check with no page/static-asset errors or Supabase requests. No signup/login was submitted. See [published evidence](verification/published-2026-11-05.json). Historical blocked-deployment statements above describe earlier stages; frontend publication is now complete, while real hosted Auth workflows, AI deployment and Google operations remain unverified.
+
+## Prepared Google Drive implementation
+
+The full 56-definition Node suite passed after adding Drive OAuth/read/disconnect (seven isolated test files). Both Edge entry points pass strict typecheck and the React/TypeScript production build passes. The new `tests/phase2/drive.py` Chromium suite passed Admin/Manager/Member access, explicit scope consent, backend-unavailable errors, account confirmation, exact-file approval, escaped hostile source text, Lao/mobile and disconnect/local-data preservation. Existing `tests/phase2/cloud.py` and `tests/smoke.py` also passed against the updated source. All service/provider traffic in these new tests is intercepted or in-process; SQL runs only in isolated PGlite.
+
+Read-only Functions/Secrets management requests still return 403 for missing `edge_functions_read` / `edge_functions_secrets_read`. The user has no Google Cloud/OAuth client and requested code/setup preparation. No Google OAuth consent, real token exchange, external file read/write, account creation, live migration 003, Drive Edge deployment or frontend publication was performed during this Drive change. The existing published website/main remain unchanged. See [Drive implementation limits](google-drive-implementation.md) and [Lao setup](google-drive-setup.lo.md).

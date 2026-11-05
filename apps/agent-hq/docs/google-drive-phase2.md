@@ -1,6 +1,6 @@
 # Google Drive OAuth — security design for review
 
-**Not connected.** This PR makes no OAuth/token/Google requests. Entering a Drive URL/ID in an agent configuration is a reference only and does not authorize ingestion. A Drive home link does not identify an approved file or folder. Existing uploads remain in IndexedDB.
+**Live Google connection is not enabled.** A read-only OAuth implementation is now prepared in this PR; see [implementation and limits](google-drive-implementation.md) and [Lao setup steps](google-drive-setup.lo.md). The remainder of this document records the broader original design, including future external writes, and must not be read as a list of implemented features. No real Google request or token exchange has been performed. A Drive home link does not identify an approved file; local uploads remain in IndexedDB.
 
 ## Trust boundary
 
@@ -8,7 +8,7 @@ The browser authenticates with Supabase and sees connection labels/scopes/status
 
 `connections` identifies organization/department, consenting account, granted scopes and revocation. `data_sources` allowlists exact file/folder/Sheet references, permitted ranges and their assigned agent. Composite tenant/department foreign keys prevent mixing sources/connections/agents. RLS exposes approved source references only within the caller's scope. These tables have no browser mutations in this PR. `private.google_tokens` is a ciphertext-only foundation; the OAuth implementation must extend it with connection FK, nonce, key version, token expiry and rotation metadata through another reviewed migration.
 
-## Proposed endpoints (not implemented)
+## Original proposed endpoints (see implementation document for current MVP)
 
 1. **POST `drive/connect`**: require confirmed user, active admin/authorized departmental manager, exact origin and request size/rate limit. Pin org, department, scopes and approved destination. Store a random single-use state hash, caller identity/session binding, expiry (5 minutes), PKCE S256 challenge/verifier and validated return location in a private table. Never derive role or return URL from the callback query. Return only the consent URL. Use fixed Google OAuth endpoints.
 2. **GET server `drive/callback`**: validate state in constant time and atomically consume it, reject expired/replayed/unsolicited codes, recheck membership and original initiating user binding, and exchange code+verifier server-side. No browser callback handles codes/tokens. Verify consenting account and actual scopes; require explicit reconciliation if they differ. Set no token in redirect URL, HTML or frontend storage. Redirect to the pinned application path with an opaque result ID. A callback is allowed to persist a connection, not trigger document writes.
