@@ -10,7 +10,8 @@
     "build:standalone": "tsc -b && node scripts/build-standalone.mjs",
     "publish:files": "npm run build && node scripts/sync-pages.mjs",
     "test:phase2": "node --experimental-strip-types --test tests/phase2/*.test.ts",
-    "check:edge": "deno check --config supabase/functions/deno.json supabase/functions/agent-api/index.ts"
+    "check:edge": "deno check --config supabase/functions/deno.json supabase/functions/agent-api/index.ts",
+    "prepare:schema": "node scripts/prepare-schema.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-lao": "^5.3.0",

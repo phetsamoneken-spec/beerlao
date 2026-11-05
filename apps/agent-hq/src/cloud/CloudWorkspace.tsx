@@ -11,6 +11,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { cloud } from "./client";
+import { cloudRequest } from "./requests";
 import { useI18n } from "../i18n";
 import { Builder, Field, Modal } from "../components/AgentBuilder";
 import { type Agent, emptyAgent, type Status } from "../model";
@@ -65,6 +66,7 @@ export default function CloudWorkspace() {
   const [busy, setBusy] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [creatingAccount, setCreatingAccount] = useState(false);
   const [editor, setEditor] = useState<Agent | null>(null);
   const [kind, setKind] = useState("budget");
   const [editing, setEditing] = useState<CloudAgent | null>(null);
@@ -131,24 +133,22 @@ export default function CloudWorkspace() {
   async function api(body: Record<string, unknown>) {
     if (!client || !session) throw new Error(t("Sign in to continue."));
     const version = generation.current.version;
-    const { data, error } = await client.functions.invoke("agent-api", {
-      body,
-    });
-    if (version !== generation.current.version) {
-      throw new Error(
-        t("Workspace changed. Retry in the selected organization."),
-      );
+    try {
+      const data = await cloudRequest(client, body);
+      if (version !== generation.current.version) {
+        throw new Error(
+          t("Workspace changed. Retry in the selected organization."),
+        );
+      }
+      return data;
+    } catch (error) {
+      if (version !== generation.current.version) {
+        throw new Error(
+          t("Workspace changed. Retry in the selected organization."),
+        );
+      }
+      throw error;
     }
-    if (error) {
-      let detail = "Cloud operation failed.";
-      try {
-        const payload = await error.context?.json();
-        detail = payload?.error || detail;
-        if (payload?.missing) detail += ": " + payload.missing.join(", ");
-      } catch {}
-      throw new Error(detail);
-    }
-    return data.data;
   }
   async function loadMemberships() {
     if (!client || !session) return;
@@ -258,20 +258,43 @@ export default function CloudWorkspace() {
             onSubmit={(e) => {
               e.preventDefault();
               void operation(async () => {
-                const { error } = await client.auth.signInWithPassword({
-                  email,
-                  password,
-                });
-                setPassword("");
-                if (error) {
-                  throw new Error(
-                    t("Sign-in failed. Check credentials and email confirmation."),
-                  );
+                if (creatingAccount) {
+                  const { data, error } = await client.auth.signUp({
+                    email,
+                    password,
+                  });
+                  setPassword("");
+                  if (error) {
+                    throw new Error(
+                      t("Account creation failed. Check the details or try again later."),
+                    );
+                  }
+                  setCreatingAccount(false);
+                  if (!data.session) {
+                    setInfo("Confirm your email, then return here to sign in.");
+                  }
+                } else {
+                  const { error } = await client.auth.signInWithPassword({
+                    email,
+                    password,
+                  });
+                  setPassword("");
+                  if (error) {
+                    throw new Error(
+                      t("Sign-in failed. Check credentials and email confirmation."),
+                    );
+                  }
                 }
               });
             }}
           >
-            <h2>{t("Sign in to company workspace")}</h2>
+            <h2>
+              {t(
+                creatingAccount
+                  ? "Create your company account"
+                  : "Sign in to company workspace",
+              )}
+            </h2>
             <label className="field">
               <span>{t("Email")}</span>
               <input
@@ -286,7 +309,10 @@ export default function CloudWorkspace() {
               <span>{t("Password")}</span>
               <input
                 type="password"
-                autoComplete="current-password"
+                autoComplete={creatingAccount
+                  ? "new-password"
+                  : "current-password"}
+                minLength={creatingAccount ? 8 : undefined}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -294,11 +320,24 @@ export default function CloudWorkspace() {
             </label>
             <button className="primary" disabled={busy}>
               <LogIn size={16} />
-              {t("Sign in")}
+              {t(creatingAccount ? "Create account" : "Sign in")}
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              disabled={busy}
+              onClick={() => {
+                setCreatingAccount(!creatingAccount);
+                setPassword("");
+                setError("");
+                setInfo("");
+              }}
+            >
+              {t(creatingAccount ? "Back to sign in" : "Create account")}
             </button>
             <p className="muted">
               {t(
-                "Sessions stay in memory. Refreshing this page requires signing in again. Ask your administrator to provision a confirmed account.",
+                "Sessions stay in memory. Refreshing this page requires signing in again. A confirmed email is required for company data.",
               )}
             </p>
           </form>

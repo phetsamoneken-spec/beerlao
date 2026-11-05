@@ -508,5 +508,17 @@
   "Loading office…": "ກຳລັງໂຫຼດຫ້ອງການ…",
   "Refresh": "ໂຫຼດໃໝ່",
   "Retry expired execution": "ລອງວຽກທີ່ໝົດເວລາອີກຄັ້ງ",
-  "INVALID_INPUT": "ຂໍ້ມູນທີ່ປ້ອນບໍ່ຖືກຕ້ອງ ຫຼືເກີນຂະໜາດທີ່ອະນຸຍາດ"
+  "INVALID_INPUT": "ຂໍ້ມູນທີ່ປ້ອນບໍ່ຖືກຕ້ອງ ຫຼືເກີນຂະໜາດທີ່ອະນຸຍາດ",
+  "Create your company account": "ສ້າງບັນຊີສຳລັບເຮັດວຽກ",
+  "Create account": "ສ້າງບັນຊີ",
+  "Back to sign in": "ກັບໄປເຂົ້າລະບົບ",
+  "Account creation failed. Check the details or try again later.": "ສ້າງບັນຊີບໍ່ສຳເລັດ. ກວດຂໍ້ມູນ ຫຼືລອງໃໝ່ພາຍຫຼັງ.",
+  "Confirm your email, then return here to sign in.": "ກະລຸນາຢືນຢັນອີເມວ ແລ້ວກັບມາເຂົ້າລະບົບຢູ່ໜ້ານີ້.",
+  "Sessions stay in memory. Refreshing this page requires signing in again. A confirmed email is required for company data.": "Session ເກັບໃນໜ່ວຍຄວາມຈຳເທົ່ານັ້ນ. ໂຫຼດໜ້າໃໝ່ແລ້ວຕ້ອງເຂົ້າລະບົບອີກ. ຕ້ອງຢືນຢັນອີເມວກ່ອນໃຊ້ຂໍ້ມູນບໍລິສັດ.",
+  "SCHEMA_NOT_INITIALIZED": "ຍັງບໍ່ໄດ້ຕິດຕັ້ງ schema ຂອງ AGENT HQ ໃນ Supabase.",
+  "AI_BACKEND_NOT_DEPLOYED": "ຍັງບໍ່ໄດ້ຕິດຕັ້ງ AI backend. ຂໍ້ມູນບໍລິສັດໃຊ້ Supabase ແຍກຕ່າງຫາກ.",
+  "BACKEND_INVALID_RESPONSE": "ຜົນຕອບຈາກ backend ບໍ່ຖືກຮູບແບບ.",
+  "SUPABASE": "SUPABASE",
+  "Cloud account": "ບັນຊີ Cloud",
+  "Organization access": "ສິດເຂົ້າເຖິງອົງກອນ"
 }

@@ -2,9 +2,10 @@ export function assertPublicEnvironment(env) {
   for (const [name, value] of Object.entries(env)) {
     if (
       name.startsWith("VITE_") && value &&
-      /(SERVICE.?ROLE|SECRET|AI_API_KEY|OPENAI_API_KEY|GOOGLE.*TOKEN)/i.test(
-        name,
-      )
+      /(SERVICE.?ROLE|SECRET|ACCESS.?TOKEN|REFRESH.?TOKEN|AI_API_KEY|OPENAI_API_KEY|GOOGLE.*TOKEN)/i
+        .test(
+          name,
+        )
     ) {
       throw new Error(
         "Server secrets must not be configured as VITE_ variables.",
@@ -12,8 +13,10 @@ export function assertPublicEnvironment(env) {
     }
   }
   const key = env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-  if (key.startsWith("sb_secret_")) {
-    throw new Error("A Supabase secret key cannot be bundled.");
+  if (key.startsWith("sb_secret_") || key.startsWith("sbp_")) {
+    throw new Error(
+      "A Supabase secret key or management token cannot be bundled.",
+    );
   }
   if (key.split(".").length === 3) {
     try {

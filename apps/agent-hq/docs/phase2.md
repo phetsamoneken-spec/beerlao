@@ -1,6 +1,6 @@
 # AGENT HQ Phase 2 — implementation for review
 
-**Draft only. No deployment, live SQL, production data changes or local-data import is authorized.** Source is in `apps/agent-hq/`. Published `agent-hq/` stays unchanged. The cloud feature is disabled by default.
+**Review branch. No deployment or local-data import has been performed. Live schema installation is still blocked by automatic approval review; only read-only project checks have executed.** Source is in `apps/agent-hq/`. Published `agent-hq/` stays unchanged. The cloud feature is disabled by default.
 
 ## Existing code inspected
 
@@ -12,9 +12,9 @@ The local demo keeps its existing characters, editing, upload, task and CEO flow
 
 ## What is implemented
 
-- Separate **Cloud workspace** navigation with real Supabase password authentication, confirmed-user checks and organization selection. Sessions/refresh tokens remain in memory; a reload signs the user out. There is no simulated login in cloud mode.
-- Admin organization creation, membership management by existing user UUID, versioned agent configuration, active/deactivated employees and full editable prompts. Invitation, email delivery, password recovery and MFA enrollment UI are not implemented; configure/provision through the reviewed Auth service.
-- Cloud task creation and input correction; server-side real AI execution; immutable draft history; review request; manager/admin approval or rejection bound to exact content hash; approved plain-text download. Editing inputs invalidates the current draft/review and preserves history.
+- Separate **Cloud workspace** navigation with real Supabase password authentication, self-service email registration, confirmed-user checks and organization selection. Sessions/refresh tokens remain in memory; a reload signs the user out. There is no simulated login in cloud mode.
+- Admin organization creation, membership management by existing user UUID, versioned agent configuration, active/deactivated employees and full editable prompts. Registration uses the reviewed Supabase Auth service and requires email confirmation. Admin invitation, password recovery and MFA enrollment UI are not implemented.
+- Cloud task creation and input correction through audited database RPCs; server-side real AI execution; immutable draft history; review request; manager/admin approval or rejection bound to exact content hash; approved plain-text download. Editing inputs invalidates the current draft/review and preserves history.
 - CEO routing is real inference over **RLS-visible active employees**. It proposes a delegate or asks for clarification. The user reviews the suggestion and creates a task; it never dispatches an external write.
 - Budget, Sales, Marketing and custom agent execution share the secured orchestrator. Budget requires positive `budget_amount` and uppercase three-letter `currency`; Sales validates supplied `sales_rows` and computes monthly totals/rank with integer cents before inference; Marketing uses only supplied authorized inputs. Existing BAF capability requires `official_template_text` and never assumes an official form.
 - Missing business facts produce `Waiting for information`; provider errors produce `Failed`, without fallback to the local simulation. Real execution requires server configuration. Tests contain explicit fixtures; runtime has no mocked inference path.
@@ -45,6 +45,10 @@ Browser roles receive SELECT with RLS and specific RPC EXECUTE privileges, never
 
 Each task pins its agent revision. Disabling an agent or revoking its Generate drafts permission takes effect on new/finalizing executions. Current org membership/department/task ownership is checked throughout. All drafts/reviews/artifacts/audits/revisions are immutable. Approvals bind exact draft UUID and SHA-256; export verifies the current draft, current status, approved review and hash. Member approvals, cross-tenant foreign keys, stale reviews and stale config revisions fail.
 
+### Browser requests and inference
+
+Company setup, membership/agent changes, task inputs, reviews and approved exports call the narrow SQL RPCs using the signed-in user session. Database checks remain authoritative for direct requests. These operations no longer depend on an Edge deployment. The browser validates the same strict request contract; malformed inputs and actor fields are rejected, and SQL errors are sanitized. CEO routing/execution always call `agent-api`; the browser cannot begin/finalize inference through this transport. Missing schema and an undeployed AI function produce explicit errors, never local demo results.
+
 ### Request handling and inference
 
 `agent-api` verifies Bearer tokens with Supabase `auth.getUser`, requires confirmed email, validates a strict action schema and bounds streamed JSON bodies to 64 KiB. Allowed origins are exact strings, never wildcards. CORS is an extra browser restriction, not authorization. Direct RPC calls remain authorized independently.
@@ -73,11 +77,12 @@ Server template: `supabase/functions/.env.example`.
 | --- | --- |
 | `SUPABASE_URL`, `SUPABASE_ANON_KEY` | Project URL and public key for caller-scoped RLS requests |
 | `SUPABASE_SERVICE_ROLE_KEY` | Privileged finalization RPC client only; never any `VITE_` variable |
+| `SUPABASE_ACCESS_TOKEN` | Development management access scoped to `api.supabase.com`, used only for authorized management operations; never frontend or Edge runtime configuration |
 | `AI_API_KEY`, `AI_MODEL` | OpenAI credential and a model supporting strict JSON-schema Chat Completions |
 | `ALLOWED_ORIGINS` | Exact comma-separated frontend origins; Pages origin excludes its `/beerlao/agent-hq/` path |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `GOOGLE_TOKEN_ENCRYPTION_KEY` | Reserved for the separately reviewed OAuth design; not used by current runtime |
 
-The build guard rejects known server-secret variable names under `VITE_`, Supabase secret keys and privileged JWT public keys. This complements secret scanning; never assume arbitrary renamed secret values can be identified automatically. `.env` files are ignored; templates are versioned. The offline service worker caches only same-origin application assets, never remote Supabase/Auth/Edge responses.
+The build guard rejects known server-secret variable names under `VITE_`, Supabase secret/management keys and privileged JWT public keys. This complements secret scanning; never assume arbitrary renamed secret values can be identified automatically. `.env` files are ignored; templates are versioned. The offline service worker caches only same-origin application assets, never remote Supabase/Auth/Edge responses.
 
 See [recorded validation results](phase2-test-results.md) for executed checks and their limits.
 
@@ -89,7 +94,7 @@ npm ci
 npm run test:phase2
 npm run check:edge
 npm run build
-npm run dev -- --port 5175
+VITE_PHASE2_ENABLED=false npm run dev -- --port 5175
 # In a second terminal, with Python Playwright and /usr/bin/chromium installed:
 ORBIT_BASE_URL=http://127.0.0.1:5175 python3 tests/smoke.py
 ORBIT_BASE_URL=http://127.0.0.1:5175 python3 tests/hq.py
@@ -112,11 +117,13 @@ ORBIT_BASE_URL=http://127.0.0.1:5176 python3 tests/phase2/cloud.py
 
 ## Remaining integration checks and approval gate
 
-No real Supabase Auth deployment, hosted Postgres/PostgREST, paid inference or Google OAuth flow was exercised because no approved service configuration is available. PGlite validates SQL/roles/RLS, but is not an end-to-end hosted Supabase certification. Before enabling any remote environment, explicitly approve the target and test migrations, gateway JWT verification/signing-key compatibility, Auth confirmation/invitations/recovery/rate limits, real model support/cost/timeout behavior, revocation, RLS and concurrency against a disposable approved project. Review the default organization self-creation policy if a closed invitation-only company is required.
+Read-only checks against the designated project verified Auth health/settings and management SQL metadata. Real end-user signup/sign-in, hosted RLS mutation/isolation tests, paid inference and Google OAuth remain unverified. The hosted project still has no AGENT HQ schema; automatic approval review blocked the migration before command execution. PGlite validates SQL/roles/RLS, but is not an end-to-end hosted Supabase certification. Before enabling any remote environment, explicitly approve the target and test migrations, gateway JWT verification/signing-key compatibility, Auth confirmation/invitations/recovery/rate limits, real model support/cost/timeout behavior, revocation, RLS and concurrency against a disposable approved project. Review the default organization self-creation policy if a closed invitation-only company is required.
 
 Google connections/sources are currently read-only foundations with no configuration UI/RPC, token vault implementation, ingestion/parsing or approved Drive write endpoint. PDF/Word/Excel generation, file malware scanning, background execution and large-file handling are outside this PR. Local uploads remain local and never become cloud evidence automatically.
 
-Required future approvals are separate: merge; target-project SQL; Auth/provider/Google secret configuration; data migration/import; frontend/Edge deployment; and each external document write. A review approval alone must not execute these actions. Do not run `publish:files`, `supabase db push`, remote SQL, deploy commands or merge this branch as part of the current task.
+Generate the atomic, guarded review SQL without executing it using `npm run prepare:schema`; output and SHA-256 manifest are under ignored `supabase/.local/`. The package refuses existing app tables/private schema and never inserts sample/local records. See [current connection status](supabase-connection.md).
+
+Required future approvals are separate: merge; target-project SQL; Auth/provider/Google secret configuration; data migration/import; frontend/Edge deployment; and each external document write. A review approval alone must not execute these actions. Do not run `publish:files`, `supabase db push`, remote migrations or deploy commands, or merge this branch without the specific operation being authorized and permitted by automatic approval review.
 
 ## ສະຫຼຸບພາສາລາວ
 
