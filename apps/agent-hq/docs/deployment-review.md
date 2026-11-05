@@ -33,7 +33,7 @@ For the next backend step, provide project-scoped Read/Write access for Edge Fun
 
 Before deployment, verify hosted `AI_API_KEY` and `AI_MODEL`, exact `ALLOWED_ORIGINS=https://phetsamoneken-spec.github.io`, built-in Supabase runtime credentials and current JWT gateway/signing-key compatibility. Provider secret values must be configured directly in hosted Supabase Edge Function secrets, not forwarded from proxy-bound credential placeholders. No paid inference has been run.
 
-Auth Site URL/redirect allowlist and email confirmation/delivery need review for the public app URL. Current permissions prevent reading or changing them. Real account and multi-user hosted workflow verification remains outstanding. Google Drive read-only OAuth/read/disconnect source is now prepared for review and defaults disabled; its migration and backend have not been deployed. See [Drive implementation](google-drive-implementation.md).
+Auth Site URL/redirect allowlist and email confirmation/delivery need review for the public app URL. Current permissions prevent reading or changing them. Real account and multi-user hosted workflow verification remains outstanding. Google Drive migration 003 and `drive-api` version 1 are now deployed after explicit approval. Templates default disabled; the approved Pages release enables the Drive UI. Real user consent and Google file workflows still require validation. See [Drive implementation](google-drive-implementation.md).
 
 ## ຂັ້ນຕອນສຳລັບເຈົ້າຂອງ
 
@@ -49,3 +49,7 @@ Auth Site URL/redirect allowlist and email confirmation/delivery need review for
 The initial release served `/beerlao/agent-hq/` successfully, while `/beerlao/` returned 404 because the preexisting root entry was named `Index.html`. GitHub Pages paths are case-sensitive. A new lowercase `index.html`, versioned as `deployment/pages-index.html` in the application source, redirects the root to `./agent-hq/` and includes a plain link fallback. The old capitalized dashboard path is retained. The exact root redirect passed the local production Chromium check before publication.
 
 The root fix is now live: Pages run [41977817797](https://github.com/phetsamoneken-spec/beerlao/actions/runs/41977817797) succeeded. Both the root and legacy dashboard return 200, all 25 checked public files match the expected hashes, and live Chromium passed the root-to-cloud-UI flow with no errors. See [publication evidence](verification/published-2026-11-05.json).
+
+## Approved Drive release
+
+After the user-local backend deployment and independent public CORS/auth-denial checks, the reviewed 23-file artifact with both Phase 2/Drive flags enabled was published to `pages/agent-hq-phase2` at `97886832fbe52bfd558e56df6c63e37781fa9807`. [Pages run 42061379256](https://github.com/phetsamoneken-spec/beerlao/actions/runs/42061379256) succeeded. All 25 live application/root/legacy files return 200 and match exact hashes. Root redirect and original `Index.html` remain unchanged. Main and Draft PR remain unmerged. The live no-submit Chromium check passed cloud signup/sign-in controls, Lao font and assets without errors or Supabase calls. Google account consent/read/refresh/disconnect are not implied by deployment. [Release evidence](verification/drive-release-2026-11-05.json).

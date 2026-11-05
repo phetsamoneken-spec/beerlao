@@ -65,3 +65,11 @@ The user-reported first real upload returned HTTP 400; the initial helper discar
 ## Confirmed hosted dependency-resolution failure
 
 The user supplied the second upload’s structured error: the hosted bundler could not resolve the pinned npm Supabase client because `nodeModulesDir` was manual. `npm run check:edge:clean` reproduces that exact failure using copied source/config, no package.json/node_modules and a fresh Deno cache. Changing the Edge config to auto resolves dependencies and typechecks both entry points successfully in that isolated condition. Added this meaningful check to review CI; ordinary checking in a populated npm checkout had hidden the deployment problem. Updated the Windows release source pin and deno.json checksum. No hosted retry or SQL/frontend change was performed by the agent.
+
+## Completed Drive deployment and public checks
+
+The user deployed `drive-api` version 1 from pinned source `74766e9` through Windows helper release `ecf0037`, keeping their new token local. Independent live checks returned allowed OPTIONS 204 with the exact origin, anonymous POST 401 UNAUTHENTICATED, empty callback 400 OAUTH_STATE_INVALID and hostile-origin OPTIONS 403 without CORS permission. This verifies remote bundling/boot and denial behavior, not Google consent or secret correctness.
+
+The reviewed Drive-enabled frontend was published to the approved Pages branch at `9788683`; Pages run 42061379256 succeeded. HTTP 200 and exact hashes passed for all 23 app files plus root and legacy pages. Live Chromium root redirect/cloud signup controls/Lao font/static assets passed without page errors, HTTP errors or submitted Auth requests. No SQL rerun, main merge, hosted fixtures, real account creation or Google file operations occurred. Historical pending/failure statements above describe earlier stages. [Release evidence](verification/drive-release-2026-11-05.json).
+
+The same published artifact also passed the intercepted Drive browser suite for Admin, Manager and Member: consent/unavailable errors, Google handoff and original-session account confirmation, exact-file approval, escaped hostile content, Lao/mobile layout, disconnect and unchanged local browser data. Every Supabase/Google call in that suite was intercepted or aborted; it proves published UI behavior rather than real OAuth/provider behavior.

@@ -1,6 +1,6 @@
 # ຕັ້ງຄ່າ Google Drive ສຳລັບ AGENT HQ
 
-ໂຄດ OAuth ແລະການອ່ານໄຟລ໌ກຽມໄວ້ໃນ Draft PR ແລ້ວ. **ຍັງບໍ່ເຊື່ອມບັນຊີ Google ຈິງ ແລະຍັງບໍ່ deploy ສ່ວນ Drive.** ລິ້ງ `drive.google.com/drive/home` ເປັນໜ້າຫຼັກ; ບໍ່ແມ່ນ OAuth Client ຫຼືລິ້ງໄຟລ໌ທີ່ອະນຸຍາດໃຫ້ແອັບອ່ານ.
+ໂຄດ OAuth ແລະການອ່ານໄຟລ໌ກຽມໄວ້ໃນ Draft PR ແລ້ວ. **ຕິດຕັ້ງ migration 003 ແລະ deploy `drive-api` ສຳເລັດແລ້ວ; frontend ເປີດ Google Drive ຕາມຄຳອະນຸມັດ. ຍັງຕ້ອງເຊື່ອມບັນຊີ Google ຈິງຕາມຂັ້ນຕອນ 7. ຢ່າລັນ SQL ຫຼື deploy ຊ້ຳ.** ລິ້ງ `drive.google.com/drive/home` ເປັນໜ້າຫຼັກ; ບໍ່ແມ່ນ OAuth Client ຫຼືລິ້ງໄຟລ໌ທີ່ອະນຸຍາດໃຫ້ແອັບອ່ານ.
 
 ## 1. ສ້າງ Google Cloud project
 
@@ -53,17 +53,17 @@ https://vhywnalpkahkfqhiqdgd.supabase.co/functions/v1/drive-api/callback
 
 Supabase runtime credentials ມາຈາກ Edge runtime; ຢ່າໃສ່ service-role key ໃນ frontend ຫຼືຊື່ຕົວແປທີ່ຂຶ້ນຕົ້ນ `VITE_`.
 
-## 5. ສິດທີ່ Codex ຍັງຂາດ
+## 5. ສິດສຳລັບການບຳລຸງຮັກສາ
 
 ຖ້າບໍ່ເຫັນ Codex Environment editor, ໃຫ້ໃຊ້ [ວິທີ PowerShell ໃນ Windows](windows-drive-deployment.lo.md). ວິທີນີ້ບໍ່ຕ້ອງສົ່ງ token ໃຫ້ Codex ຫຼື Publish environment.
 
 Management token ປັດຈຸບັນຕອບ 403 ສຳລັບ Functions ແລະ Secrets. ຖ້າໃຫ້ Codex deploy ໃຫ້, ສ້າງ token ຈຳກັດສະເພາະ project ນີ້ ແລະໃຫ້ Read/Write ສຳລັບ **Edge Functions** ແລະ **Edge Function Secrets**. ການກວດ Auth URLs ຕ້ອງມີສິດ **Auth configuration** ດ້ວຍ.
 
-ນຳ token ໃໝ່ໄປໃສ່ **Codex Environment → HTTP secrets → `SUPABASE_ACCESS_TOKEN`**, allowed domain `api.supabase.com`, ບັນທຶກ ແລະ Publish environment ຜ່ານ UI. ບໍ່ສົ່ງ token ໃນແຊັດ. ຖ້າຕັ້ງ Secrets ເອງໃນ Supabase UI ກໍບໍ່ຈຳເປັນໃຫ້ Codex ຮູ້ຄ່າ secret.
+ການ deploy ຄັ້ງນີ້ໃຊ້ token ໃນ Windows ຂອງທ່ານສຳເລັດແລ້ວ; ບໍ່ຕ້ອງຄົ້ນຫາ Environment editor ຫຼືສົ່ງ token ໃນແຊັດ.
 
 ## 6. ຕິດຕັ້ງຫຼັງກວດທານ
 
-ກ່ອນເປີດໃຊ້ຈິງ ຕ້ອງກວດ ແລະອະນຸມັດການປ່ຽນແປງໃໝ່ນີ້:
+ລຳດັບນີ້ໄດ້ອະນຸມັດແລະຕິດຕັ້ງແລ້ວ. ເກັບໄວ້ອ້າງອີງ; ຢ່າລັນຊ້ຳ. ການທົດສອບ OAuth ຈິງຕາມຂໍ້ 3 ຍັງຕ້ອງເຮັດຈາກບັນຊີຂອງທ່ານ:
 
 1. ລັນ migration `202611050003_google_drive.sql` ເທົ່ານັ້ນ ເທິງ schema ທີ່ຕິດຕັ້ງ Phase 2 ແລ້ວ. ຢ່າລັນ migrations 001/002 ຊ້ຳ.
 2. Deploy `drive-api` ພ້ອມ `verify_jwt=false` ຕາມ config. Callback ຈາກ Google ບໍ່ມີ Supabase JWT; ທຸກ POST ຂອງແອັບຍັງກວດ bearer session ກັບ Supabase Auth ໃນ function.

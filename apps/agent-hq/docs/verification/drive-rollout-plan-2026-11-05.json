@@ -1,6 +1,6 @@
 {
   "project": "vhywnalpkahkfqhiqdgd",
-  "status": "migration_installed_windows_upload_http400_function_frontend_pending",
+  "status": "migration_backend_frontend_deployed_google_consent_pending",
   "migration": {
     "file": "supabase/migrations/202611050003_google_drive.sql",
     "sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249",
@@ -12,7 +12,7 @@
     "sha256": "d470e4d8df84b763ac348130cb1de7c94750d0b8dd5a3f7c89d30aed1ded340f",
     "default": "read_only",
     "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only",
-    "latest_attempt": "Confirmed remote HTTP 400: nodeModulesDir manual expected preinstalled npm modules. Reproduced in a clean directory; auto mode passes both entry points with a fresh cache. Updated source pin/checksum. Awaiting user-local retry; no SQL rerun or frontend change.",
+    "latest_attempt": "User-local upload succeeded: drive-api version 1. CORS PASS; unauthenticated POST DENIED. Independent public verification also passed; no migration rerun.",
     "drive_source_commit": "74766e9e8eb6af70dcc345032d9328244b9bc3a5"
   },
   "frontend": {
@@ -45,8 +45,11 @@
       "assets/WebGPURenderer-CR3bxFka.js": "a1dadedbd8e3a56a3690cb8ec3bb6b4df5a53d2bb5847abdec59bc1ce770dbeb",
       "assets/getTexelRangeRects-C3i1FQNx.js": "624019b99d449e56002aa96a98b916c5d39e6b56cbdf05222beb478408d6c15f",
       "assets/CloudWorkspace-Crao1yvE.js": "ee739d0a125f37b918598fbf02c6e596bd5c7bb91f7bc8693fd5d793d42987e7"
-    }
+    },
+    "published_commit": "97886832fbe52bfd558e56df6c63e37781fa9807",
+    "deployment_run": "https://github.com/phetsamoneken-spec/beerlao/actions/runs/42061379256"
   },
   "scope": "New Drive migration; user-local function deploy; publish frontend after backend checks. No main merge or Google file operations.",
-  "approval": "Explicit user approval appovl following exact three-step rollout request"
+  "approval": "Explicit user approval appovl following exact three-step rollout request",
+  "evidence": "drive-release-2026-11-05.json"
 }
