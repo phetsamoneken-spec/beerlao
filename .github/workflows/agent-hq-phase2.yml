@@ -23,5 +23,6 @@ jobs:
       - run: npm run test:phase2
       - run: pwsh -NoLogo -NoProfile -File tests/phase2/windows-drive-deploy.test.ps1
       - run: npm run check:edge
+      - run: npm run check:edge:clean
       - run: npm run build
 # Deliberately no deployment, database link, remote migration or secret-bearing job.
