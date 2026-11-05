@@ -1,0 +1,55 @@
+{
+  "project": "vhywnalpkahkfqhiqdgd",
+  "status": "migration_backend_frontend_deployed_google_consent_pending",
+  "migration": {
+    "file": "supabase/migrations/202611050003_google_drive.sql",
+    "sha256": "5829206aa1c90b114756b59aa9b01f96aa8d06732222c1dab91828dfd9af3249",
+    "applied_at_utc": "2026-11-05T15:29:39.950228+00:00",
+    "evidence": "drive-migration-2026-11-05.json"
+  },
+  "windows_script": {
+    "file": "scripts/windows-drive-deploy.ps1",
+    "sha256": "d470e4d8df84b763ac348130cb1de7c94750d0b8dd5a3f7c89d30aed1ded340f",
+    "default": "read_only",
+    "deploy": "explicit -Deploy and typed target confirmation; creates drive-api only",
+    "latest_attempt": "User-local upload succeeded: drive-api version 1. CORS PASS; unauthenticated POST DENIED. Independent public verification also passed; no migration rerun.",
+    "drive_source_commit": "74766e9e8eb6af70dcc345032d9328244b9bc3a5"
+  },
+  "frontend": {
+    "flags": {
+      "VITE_PHASE2_ENABLED": true,
+      "VITE_GOOGLE_DRIVE_ENABLED": true
+    },
+    "review_directory": "supabase/.local/drive-frontend-review",
+    "files": {
+      "manifest.webmanifest": "e3187aa27d0bfb576323f8707bf23952818412bfbe6871c06f41c1fd206e5cb4",
+      "hq-512.png": "58cc528b3447ebc73e0129b80478780f8a85971515711071e146f2522883ccc4",
+      "hq-192.png": "1f5a0901260e044b9e616e3bb7989878eb34a6e9f26b2044444a9fff8cf5fa00",
+      "index.html": "f57b773e20caef1d91d4e7729b922dc43b1f2277e8f2b411f4c22ffd49a39333",
+      "sw.js": "72c37c215e84d944107069121261a144cbdee1e790c38306b8b98e9636f2d18f",
+      "assets/noto-sans-lao-latin-ext-wght-normal-DhjvDJcw.woff2": "08846faba563bb6175928b6046043ffbc2f9243a1b1684a57ddc18af42f574ca",
+      "assets/noto-sans-lao-latin-wght-normal-4L1CRwqI.woff2": "83a311399ebeaceacf5b7e32ffb41a67c3c1902dc1acbde27cc510c5a1acd3df",
+      "assets/webworkerAll-yexMJsVd.js": "df58508ec03aeee04218acc7664480839f8f44b6d5296ed3e84beba4b75eeb29",
+      "assets/chibi-room-yeYINzPU.png": "bd70480111c191e9ab77aed8554c9ece8fe03bea5e13601f29aa5b81bfa42aa4",
+      "assets/chibi-team-b-B4QPv-.png": "89c02bc4e7f18acff6f0f967ab17e98e1a3a49bfa07681b1446427f51097278a",
+      "assets/RenderTargetSystem-CAbl77Qe.js": "1fb981f431f6031d710da2c6e3ae7c7ad2b2300bd6299535dec4ec6120e4e73f",
+      "assets/noto-sans-lao-lao-wght-normal-C_K-dgyN.woff2": "c1a81b4fa4607b046b27d6593dc1124cffbe23100f993fdd39bef1d9f90bcedc",
+      "assets/WebGLRenderer-ClJktfQI.js": "a818bda9043498086795746674d6259f1bbce0c2b9125d52438ea6652b244ebb",
+      "assets/Filter-DWMAhUaj.js": "4e0b10e9598c249ee98b65f302ba352234c8b10783350755f40a46575bd2071e",
+      "assets/index-CbXvwqoG.css": "41be8f00fbda6694032687146363577f3547f969a32278d7f6355e104dab3e6d",
+      "assets/CanvasRenderer-B1Jv9_-l.js": "d68ab4756d854e6cde7da641cbe19e4bb0d7957cfe6eb17f70ee8a18fa5b1adf",
+      "assets/browserAll-DkA5yJb7.js": "bd3fc5a1e967395baa6a276576f6e3202b22c20f506b25d6bbdb048965d83178",
+      "assets/index-B_FlTKK4.js": "597e57ce3e60775604d2b7c5d960797feb5ec08d797871912dd0fa9da4a094c4",
+      "assets/BitmapFont-DNU7xExH.js": "f07971a5520c634c11ce80d104a2198058c1c7de33d998e3297ecffcac9a58f8",
+      "assets/Office-O5JLi0bm.js": "c95be0bd4064702e6c9b22ab61f4716c0ebd54dcf80eeae24db47d6a057937f1",
+      "assets/WebGPURenderer-CR3bxFka.js": "a1dadedbd8e3a56a3690cb8ec3bb6b4df5a53d2bb5847abdec59bc1ce770dbeb",
+      "assets/getTexelRangeRects-C3i1FQNx.js": "624019b99d449e56002aa96a98b916c5d39e6b56cbdf05222beb478408d6c15f",
+      "assets/CloudWorkspace-Crao1yvE.js": "ee739d0a125f37b918598fbf02c6e596bd5c7bb91f7bc8693fd5d793d42987e7"
+    },
+    "published_commit": "97886832fbe52bfd558e56df6c63e37781fa9807",
+    "deployment_run": "https://github.com/phetsamoneken-spec/beerlao/actions/runs/42061379256"
+  },
+  "scope": "New Drive migration; user-local function deploy; publish frontend after backend checks. No main merge or Google file operations.",
+  "approval": "Explicit user approval appovl following exact three-step rollout request",
+  "evidence": "drive-release-2026-11-05.json"
+}

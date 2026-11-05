@@ -1,0 +1,224 @@
+{
+  "recorded_at_utc": "2026-11-05T16:10:23.461349+00:00",
+  "project": "vhywnalpkahkfqhiqdgd",
+  "approval": "Explicit user appovl for migration 003, user-local Drive deployment and frontend publication after backend checks.",
+  "backend": {
+    "deployment_reported_by_user": {
+      "function": "drive-api",
+      "version": 1,
+      "source_commit": "74766e9e8eb6af70dcc345032d9328244b9bc3a5",
+      "helper_release": "ecf00378b093a7ecd956fb2cddfbf6b31349d638",
+      "credential_location": "User Windows PowerShell only; token and hosted secret values not retrieved."
+    },
+    "independent_public_checks": {
+      "verified_at_utc": "2026-11-05T16:05:50.983114+00:00",
+      "url": "https://vhywnalpkahkfqhiqdgd.supabase.co/functions/v1/drive-api",
+      "checks": [
+        {
+          "test": "cors",
+          "status": 204,
+          "allow_origin": "https://phetsamoneken-spec.github.io",
+          "body": ""
+        },
+        {
+          "test": "unauthenticated",
+          "status": 401,
+          "allow_origin": "https://phetsamoneken-spec.github.io",
+          "body": "{\"error\":\"UNAUTHENTICATED\"}"
+        },
+        {
+          "test": "invalid_callback",
+          "status": 400,
+          "allow_origin": null,
+          "body": "{\"error\":\"OAUTH_STATE_INVALID\"}"
+        },
+        {
+          "test": "hostile_origin",
+          "status": 403,
+          "allow_origin": null,
+          "body": "{\"error\":\"ORIGIN_NOT_ALLOWED\"}"
+        }
+      ],
+      "limitations": "No real Google consent, refresh or file read exercised."
+    }
+  },
+  "frontend": {
+    "verified_at_utc": "2026-11-05T16:09:24.394670+00:00",
+    "published_commit": "97886832fbe52bfd558e56df6c63e37781fa9807",
+    "deployment_run": "https://github.com/phetsamoneken-spec/beerlao/actions/runs/42061379256",
+    "source": {
+      "branch": "pages/agent-hq-phase2",
+      "path": "/"
+    },
+    "base_url": "https://phetsamoneken-spec.github.io/beerlao/",
+    "verified_files": [
+      {
+        "path": "",
+        "status": 200,
+        "sha256": "aa7d74825d11984bb96e47495d633df03900b6e6f448084ca8eb9f720c621aef"
+      },
+      {
+        "path": "Index.html",
+        "status": 200,
+        "sha256": "2a43218c5c69a72855b7ae0dfe50ae968f208c7cbc5dcb6c31517a8d043988a7"
+      },
+      {
+        "path": "agent-hq/manifest.webmanifest",
+        "status": 200,
+        "sha256": "e3187aa27d0bfb576323f8707bf23952818412bfbe6871c06f41c1fd206e5cb4"
+      },
+      {
+        "path": "agent-hq/hq-512.png",
+        "status": 200,
+        "sha256": "58cc528b3447ebc73e0129b80478780f8a85971515711071e146f2522883ccc4"
+      },
+      {
+        "path": "agent-hq/hq-192.png",
+        "status": 200,
+        "sha256": "1f5a0901260e044b9e616e3bb7989878eb34a6e9f26b2044444a9fff8cf5fa00"
+      },
+      {
+        "path": "agent-hq/index.html",
+        "status": 200,
+        "sha256": "f57b773e20caef1d91d4e7729b922dc43b1f2277e8f2b411f4c22ffd49a39333"
+      },
+      {
+        "path": "agent-hq/sw.js",
+        "status": 200,
+        "sha256": "72c37c215e84d944107069121261a144cbdee1e790c38306b8b98e9636f2d18f"
+      },
+      {
+        "path": "agent-hq/assets/noto-sans-lao-latin-ext-wght-normal-DhjvDJcw.woff2",
+        "status": 200,
+        "sha256": "08846faba563bb6175928b6046043ffbc2f9243a1b1684a57ddc18af42f574ca"
+      },
+      {
+        "path": "agent-hq/assets/noto-sans-lao-latin-wght-normal-4L1CRwqI.woff2",
+        "status": 200,
+        "sha256": "83a311399ebeaceacf5b7e32ffb41a67c3c1902dc1acbde27cc510c5a1acd3df"
+      },
+      {
+        "path": "agent-hq/assets/webworkerAll-yexMJsVd.js",
+        "status": 200,
+        "sha256": "df58508ec03aeee04218acc7664480839f8f44b6d5296ed3e84beba4b75eeb29"
+      },
+      {
+        "path": "agent-hq/assets/chibi-room-yeYINzPU.png",
+        "status": 200,
+        "sha256": "bd70480111c191e9ab77aed8554c9ece8fe03bea5e13601f29aa5b81bfa42aa4"
+      },
+      {
+        "path": "agent-hq/assets/chibi-team-b-B4QPv-.png",
+        "status": 200,
+        "sha256": "89c02bc4e7f18acff6f0f967ab17e98e1a3a49bfa07681b1446427f51097278a"
+      },
+      {
+        "path": "agent-hq/assets/RenderTargetSystem-CAbl77Qe.js",
+        "status": 200,
+        "sha256": "1fb981f431f6031d710da2c6e3ae7c7ad2b2300bd6299535dec4ec6120e4e73f"
+      },
+      {
+        "path": "agent-hq/assets/noto-sans-lao-lao-wght-normal-C_K-dgyN.woff2",
+        "status": 200,
+        "sha256": "c1a81b4fa4607b046b27d6593dc1124cffbe23100f993fdd39bef1d9f90bcedc"
+      },
+      {
+        "path": "agent-hq/assets/WebGLRenderer-ClJktfQI.js",
+        "status": 200,
+        "sha256": "a818bda9043498086795746674d6259f1bbce0c2b9125d52438ea6652b244ebb"
+      },
+      {
+        "path": "agent-hq/assets/Filter-DWMAhUaj.js",
+        "status": 200,
+        "sha256": "4e0b10e9598c249ee98b65f302ba352234c8b10783350755f40a46575bd2071e"
+      },
+      {
+        "path": "agent-hq/assets/index-CbXvwqoG.css",
+        "status": 200,
+        "sha256": "41be8f00fbda6694032687146363577f3547f969a32278d7f6355e104dab3e6d"
+      },
+      {
+        "path": "agent-hq/assets/CanvasRenderer-B1Jv9_-l.js",
+        "status": 200,
+        "sha256": "d68ab4756d854e6cde7da641cbe19e4bb0d7957cfe6eb17f70ee8a18fa5b1adf"
+      },
+      {
+        "path": "agent-hq/assets/browserAll-DkA5yJb7.js",
+        "status": 200,
+        "sha256": "bd3fc5a1e967395baa6a276576f6e3202b22c20f506b25d6bbdb048965d83178"
+      },
+      {
+        "path": "agent-hq/assets/index-B_FlTKK4.js",
+        "status": 200,
+        "sha256": "597e57ce3e60775604d2b7c5d960797feb5ec08d797871912dd0fa9da4a094c4"
+      },
+      {
+        "path": "agent-hq/assets/BitmapFont-DNU7xExH.js",
+        "status": 200,
+        "sha256": "f07971a5520c634c11ce80d104a2198058c1c7de33d998e3297ecffcac9a58f8"
+      },
+      {
+        "path": "agent-hq/assets/Office-O5JLi0bm.js",
+        "status": 200,
+        "sha256": "c95be0bd4064702e6c9b22ab61f4716c0ebd54dcf80eeae24db47d6a057937f1"
+      },
+      {
+        "path": "agent-hq/assets/WebGPURenderer-CR3bxFka.js",
+        "status": 200,
+        "sha256": "a1dadedbd8e3a56a3690cb8ec3bb6b4df5a53d2bb5847abdec59bc1ce770dbeb"
+      },
+      {
+        "path": "agent-hq/assets/getTexelRangeRects-C3i1FQNx.js",
+        "status": 200,
+        "sha256": "624019b99d449e56002aa96a98b916c5d39e6b56cbdf05222beb478408d6c15f"
+      },
+      {
+        "path": "agent-hq/assets/CloudWorkspace-Crao1yvE.js",
+        "status": 200,
+        "sha256": "ee739d0a125f37b918598fbf02c6e596bd5c7bb91f7bc8693fd5d793d42987e7"
+      }
+    ]
+  },
+  "browser": {
+    "live_no_submit_check": {
+      "url": "https://phetsamoneken-spec.github.io/beerlao/",
+      "cloud_signup_form": true,
+      "lao_font": true,
+      "page_errors": [],
+      "http_errors": [],
+      "supabase_requests": [],
+      "note": "No signup/login submitted; UI/static asset check only"
+    },
+    "published_artifact_intercepted_drive_check": {
+      "result": "passed",
+      "roles": [
+        "admin",
+        "manager",
+        "member"
+      ],
+      "checks": [
+        "explicit scope consent",
+        "backend unavailable fails closed",
+        "account confirmation handoff",
+        "approved file selection",
+        "escaped untrusted text",
+        "Lao/mobile",
+        "disconnect",
+        "unchanged local data"
+      ]
+    },
+    "fixture_boundary": "All production Supabase requests intercepted with in-memory Auth/database/Drive responses. Google requests aborted. No real account, OAuth, hosted DB fixture or file request."
+  },
+  "preserved": {
+    "main_commit": "019f3d4609f00ba2d58819102ebaa3f17d1a8f1b",
+    "draft_pr_unmerged": true,
+    "root_and_legacy_pages_unchanged": true,
+    "local_data_unchanged_in_browser_fixture": true
+  },
+  "remaining": [
+    "User completes real Google consent and original-session account confirmation.",
+    "Real Google read/refresh/disconnect and hosted multi-user workflows remain untested.",
+    "AI agent-api remains undeployed; provider configuration is separate.",
+    "Retention sweep, key rotation and Google restricted-scope verification remain operational limits."
+  ]
+}

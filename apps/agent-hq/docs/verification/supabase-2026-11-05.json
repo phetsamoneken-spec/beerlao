@@ -1,0 +1,264 @@
+{
+  "installation": {
+    "project": "vhywnalpkahkfqhiqdgd",
+    "sha256": "ba8e2c9ae1a349b95bd70ca2c46ac0df80be962db9f9d610276eebf07de81857",
+    "completed_at": "2026-11-05T05:40:54.893033+00:00",
+    "management_result": [],
+    "scope": "Approved schema/RLS/RPC creation only; no user or business records inserted"
+  },
+  "manifest": {
+    "sources": [
+      {
+        "file": "202611040001_phase2_schema.sql",
+        "sha256": "42db2a0c17177af4e27cd58a534a59588ab9d7694edfb0a032736d0a48873e17"
+      },
+      {
+        "file": "202611040002_phase2_operations.sql",
+        "sha256": "71d78fc568cde493b74554043761af82ee623f777f5a897bb5e6e14c9c279913"
+      }
+    ],
+    "sha256": "ba8e2c9ae1a349b95bd70ca2c46ac0df80be962db9f9d610276eebf07de81857"
+  },
+  "hosted_metadata": {
+    "tables": [
+      {
+        "rls": true,
+        "table": "agent_revisions",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "agents",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "ai_runs",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "artifacts",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "audit_events",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "connections",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "data_sources",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "drafts",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "memberships",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "organizations",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "reviews",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      },
+      {
+        "rls": true,
+        "table": "tasks",
+        "policy_count": 1,
+        "anonymous_access": false,
+        "authenticated_write": false,
+        "authenticated_select": true
+      }
+    ],
+    "functions": [
+      {
+        "function": "begin_ai_run",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "create_organization",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "create_task",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "export_approved",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "finish_ai_run",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": false
+      },
+      {
+        "function": "review_draft",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "route_limit",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "save_agent",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "set_membership",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "submit_review",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      },
+      {
+        "function": "update_task_inputs",
+        "search_path": [
+          "search_path=\"\""
+        ],
+        "service_execute": true,
+        "security_definer": true,
+        "anonymous_execute": false,
+        "authenticated_execute": true
+      }
+    ],
+    "auth_user_count": 0,
+    "organization_count": 0,
+    "task_count": 0,
+    "audit_count": 0,
+    "anonymous_private_schema": false,
+    "authenticated_token_access": false,
+    "immutable_triggers": 5
+  },
+  "public_api": {
+    "auth_health": {
+      "status": 200,
+      "code": null
+    },
+    "organizations_anonymous": {
+      "status": 401,
+      "code": "42501"
+    },
+    "rpc_anonymous": {
+      "status": 401,
+      "code": "42501"
+    },
+    "ai_backend": {
+      "status": 404,
+      "code": "NOT_FOUND"
+    }
+  },
+  "limitations": [
+    "No real signup/signin or multi-user hosted mutation/isolation tests",
+    "No CLI migration-history entries created; reconcile before db push",
+    "No frontend/Edge deployment, merge, paid inference or Google Drive operations"
+  ]
+}

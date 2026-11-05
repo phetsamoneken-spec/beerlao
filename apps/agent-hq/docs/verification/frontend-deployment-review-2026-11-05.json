@@ -1,0 +1,69 @@
+{
+  "prepared_branch": "pages/agent-hq-phase2",
+  "prepared_commit": "f697fca92f49ea75f6c6db10992e54b04c00c7b2",
+  "current_live_source": {
+    "branch": "pages/agent-hq-phase2",
+    "path": "/"
+  },
+  "proposed_live_source": {
+    "branch": "pages/agent-hq-phase2",
+    "path": "/"
+  },
+  "public_app_url": "https://phetsamoneken-spec.github.io/beerlao/agent-hq/",
+  "deployment_status": "published_after_owner_selected_approved_branch",
+  "build": {
+    "source_commit": "2bd2ce65a0cc663a59df9812b295c4ce48c40900",
+    "cloud_enabled": true,
+    "project": "vhywnalpkahkfqhiqdgd",
+    "files": {
+      "manifest.webmanifest": "e3187aa27d0bfb576323f8707bf23952818412bfbe6871c06f41c1fd206e5cb4",
+      "hq-512.png": "58cc528b3447ebc73e0129b80478780f8a85971515711071e146f2522883ccc4",
+      "hq-192.png": "1f5a0901260e044b9e616e3bb7989878eb34a6e9f26b2044444a9fff8cf5fa00",
+      "index.html": "beb1f3289821653c6d58e37773ffa19dbb14941caf9797b88838c8340b26d7ba",
+      "sw.js": "4761ae6241e1c5d2e08bd0f96ffa78ff3143c611f3d6a25e807c397f9649352f",
+      "assets/noto-sans-lao-latin-ext-wght-normal-DhjvDJcw.woff2": "08846faba563bb6175928b6046043ffbc2f9243a1b1684a57ddc18af42f574ca",
+      "assets/WebGPURenderer-COsARvW-.js": "4d59da116e1cab502ffe41ecabb599464d59a59cfaf7f7fc3180378c04c556af",
+      "assets/webworkerAll-lCyKzhcN.js": "c01b08fd94f0065b12d290b1b6810c24b19bb41226acbbb2e66c6cd3b8760f37",
+      "assets/BitmapFont-B_h4NUIb.js": "151f2bb8b4bc8af461724f227797913e7e3df22de5ac4bf606f11c86c83d7175",
+      "assets/noto-sans-lao-latin-wght-normal-4L1CRwqI.woff2": "83a311399ebeaceacf5b7e32ffb41a67c3c1902dc1acbde27cc510c5a1acd3df",
+      "assets/chibi-room-yeYINzPU.png": "bd70480111c191e9ab77aed8554c9ece8fe03bea5e13601f29aa5b81bfa42aa4",
+      "assets/index-C011zE3n.css": "e26651f8f30fe359f8a3c5e1e76cb4c3054e28b049fdf7bfd160ca11b61e2e79",
+      "assets/WebGLRenderer-BnJYJSar.js": "996fb1c0c1e91a55116b244a2a92ee4fa7aca71f695338b5df28d10671c97a45",
+      "assets/chibi-team-b-B4QPv-.png": "89c02bc4e7f18acff6f0f967ab17e98e1a3a49bfa07681b1446427f51097278a",
+      "assets/noto-sans-lao-lao-wght-normal-C_K-dgyN.woff2": "c1a81b4fa4607b046b27d6593dc1124cffbe23100f993fdd39bef1d9f90bcedc",
+      "assets/getTexelRangeRects-DvwzGeKv.js": "d32358fbb21984bd432099d3a42f70da26c83f2784ba402b757858f492b8baf6",
+      "assets/RenderTargetSystem-COBijO2t.js": "037557921b29f22999952afe85f454edc304a083f0a9bcd8357d5f396cb94ebb",
+      "assets/Office-DC5Y-PsR.js": "2bb2f6d50cbee89261355b43e1057a503cf8143d405b384cca28eb109816e3d5",
+      "assets/CloudWorkspace-Be0rhaLC.js": "e08e00029e9d6fbcd09d7e603b3a7d0fbe4f3f1adb90ceb07efe1a9e82a7ba17",
+      "assets/CanvasRenderer-D-6v46Se.js": "57be3e57220a09baf8c17e27a62d2b80b3e007ce3723bf07696d6b56938fe700",
+      "assets/browserAll-SBvKebFQ.js": "acef027a187a8ec9db936de27396b108fd3c897fdb0537c426f74ffdd58fd155",
+      "assets/Filter-WrhbMg6v.js": "149b22f68401ca6c2d3e5b0f0150df20d99c257e2e64554f102ee226a0f58e6b",
+      "assets/index-BowB1BZq.js": "6c803d845a1e5e9dab9e47a56d747fe6e0044422b6db6d170aaaf59b001e598e"
+    }
+  },
+  "local_production_ui_check": {
+    "url": "http://127.0.0.1:5180/agent-hq/",
+    "cloud_signup_form": true,
+    "lao_font": true,
+    "page_errors": [],
+    "http_errors": [],
+    "supabase_requests": [],
+    "note": "No signup/login submitted; UI/static asset check only"
+  },
+  "missing_management_permissions": [
+    "edge_functions_read",
+    "edge_functions_secrets_read",
+    "auth_config_read"
+  ],
+  "github_api_result": {
+    "status": 403,
+    "message": "Resource not accessible by integration",
+    "operation": "PUT /repos/phetsamoneken-spec/beerlao/pages",
+    "post_attempt_source": {
+      "branch": "main",
+      "path": "/"
+    }
+  },
+  "current_live_commit": "b894b07f00466bd0101548ac48a19ead4176431d",
+  "live_verification_record": "published-2026-11-05.json"
+}

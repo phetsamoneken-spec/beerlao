@@ -8,25 +8,33 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "build:standalone": "tsc -b && node scripts/build-standalone.mjs",
-    "publish:files": "npm run build && node scripts/sync-pages.mjs"
+    "publish:files": "npm run build && node scripts/sync-pages.mjs",
+    "test:phase2": "node --experimental-strip-types --test tests/phase2/*.test.ts",
+    "check:edge": "deno check --config supabase/functions/deno.json supabase/functions/agent-api/index.ts supabase/functions/drive-api/index.ts",
+    "check:edge:clean": "node scripts/check-edge-clean.mjs",
+    "prepare:schema": "node scripts/prepare-schema.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-lao": "^5.3.0",
     "@react-three/fiber": "^9.4.0",
+    "@supabase/supabase-js": "^2.118.0",
     "@tailwindcss/vite": "^4.1.0",
     "lucide-react": "^0.468.0",
     "pixi.js": "^8.22.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.0",
-    "three": "^0.181.0"
+    "three": "^0.181.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
     "@types/node": "^26.6.6",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/three": "^0.181.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "deno": "^2.9.6",
     "typescript": "~5.9.3",
     "vite": "^7.2.0"
   }
